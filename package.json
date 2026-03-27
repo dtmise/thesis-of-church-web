@@ -1,0 +1,30 @@
+{
+  "name": "thesis-of-church-web",
+  "version": "1.0.0",
+  "description": "Backend of The Church-Turing Thesis contest written on Node.js",
+  "keywords": [
+    "node.js",
+    "backend"
+  ],
+  "homepage": "https://github.com/dtmise/thesis-of-church-web#readme",
+  "bugs": {
+    "url": "https://github.com/dtmise/thesis-of-church-web/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dtmise/thesis-of-church-web.git"
+  },
+  "license": "ISC",
+  "author": "dtmise@atomicmail.io",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^25.5.0",
+    "jest": "^30.3.0",
+    "supertest": "^7.2.2"
+  }
+}
