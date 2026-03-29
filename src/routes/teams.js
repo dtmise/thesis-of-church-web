@@ -1,14 +1,13 @@
 import { Router } from 'express';
 import { getAllTeams, findTeamById, getTeamMembers } from '../db.js';
-import { authMiddleware } from '../middleware/auth.js';
 
 const router = Router();
 
-router.get('/', authMiddleware, (req, res) => {
+router.get('/', (req, res) => {
     res.json(getAllTeams());
 });
 
-router.get('/:id', authMiddleware, (req, res) => {
+router.get('/:id', (req, res) => {
     const teamId = parseInt(req.params.id, 10);
     const team = findTeamById(teamId);
     if (!team) {

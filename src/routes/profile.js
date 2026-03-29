@@ -1,10 +1,9 @@
 import { Router } from 'express';
 import { findTeamById, getTeamMembers, updateUser } from '../db.js';
-import { authMiddleware } from '../middleware/auth.js';
 
 const router = Router();
 
-router.get('/', authMiddleware, (req, res) => {
+router.get('/', (req, res) => {
     const user = req.user;
     const team = findTeamById(user.teamId);
     const members = getTeamMembers(user.teamId).map(m => ({
@@ -24,7 +23,7 @@ router.get('/', authMiddleware, (req, res) => {
     });
 });
 
-router.put('/', authMiddleware, (req, res) => {
+router.put('/', (req, res) => {
     const { fullName, group } = req.body;
     const updated = updateUser(req.user.id, { fullName, group });
     if (!updated) {

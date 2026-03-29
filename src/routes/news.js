@@ -1,14 +1,13 @@
 import { Router } from 'express';
 import { getAllNews, findNewsById } from '../db.js';
-import { authMiddleware } from '../middleware/auth.js';
 
 const router = Router();
 
-router.get('/', authMiddleware, (req, res) => {
+router.get('/', (req, res) => {
     res.json(getAllNews());
 });
 
-router.get('/:id', authMiddleware, (req, res) => {
+router.get('/:id', (req, res) => {
     const newsId = parseInt(req.params.id, 10);
     const news = findNewsById(newsId);
     if (!news) {

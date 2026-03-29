@@ -20,12 +20,13 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "test": "node --experimental-vm-modules node_modules/.bin/jest --config ./test/jest.config.js"
+    "test": "node --experimental-vm-modules node_modules/.bin/jest --config ./test/jest.config.js  --runInBand --verbose"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "express": "^4.21.0",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "pg-promise": "^12.6.2"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
