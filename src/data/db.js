@@ -7,7 +7,7 @@ const dbConfigs = {
     database: process.env.DB_NAME,
     password: process.env.DB_PASSWORD
 };
-const db = pgp(dbConfigs);
+const db = pgp()(dbConfigs);
 
 export function createTeam(name) {
     const team = { id: ++teamIdCounter, name };

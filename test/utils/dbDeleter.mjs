@@ -6,7 +6,7 @@ const dbDeleter = new class {
 
     async deleteDb() {
         if (!this.db) {
-            const { default: dbFactory } = await import('./dbFactory.js');
+            const { default: dbFactory } = await import('./dbFactory.mjs');
             this.db = dbFactory.getDb();
         }
         if (!this.deleteQuery) {
