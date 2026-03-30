@@ -10,11 +10,11 @@ import errorSupresser from './middleware/errorSupresser.js';
 
 let errorPasser;
 
-if (process.env.NODE_ENV !== 'test') {
+if (process.env.NODE_ENV === 'test') {
     errorPasser = fn => {
         return async (req, res, next) => {
             try {
-                fn(req, res, next);
+                await fn(req, res, next);
             } catch(err) {
                 next(err);
             }
@@ -23,8 +23,6 @@ if (process.env.NODE_ENV !== 'test') {
 } else {
     errorPasser = fn => { return fn };
 }
-console.log('errorPasser(fn)', errorPasser(authRoutes));
-console.log('errorPasser(fn) === fn', errorPasser(authRoutes) === authRoutes);
 const app = express();
 
 app.use(express.json());
