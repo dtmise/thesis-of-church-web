@@ -1,4 +1,4 @@
-const logMiddleware = (req, res, next) => {
+const outputLogMiddleware = (req, res, next) => {
     const now = new Date();
     const timestamp = now.toLocaleDateString('en-GB', {
         day: 'numeric',
@@ -9,12 +9,12 @@ const logMiddleware = (req, res, next) => {
         second: '2-digit'
     });
     console.log(
+        'OUTPUT: ',
         timestamp, '::', 
-        req.method, 
-        req.path, '::',
-        'urlencoded and body arguments = ', req.body
+        res.status, 
+        'body = ', res.body
     );
     next();
 }
 
-export default logMiddleware;
+export default outputLogMiddleware;

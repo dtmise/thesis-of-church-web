@@ -54,17 +54,21 @@ router.post('/register-team', async (req, res) => {
 });
 
 router.post('/login', async (req, res) => {
+    console.log('{ email, password }');
     const { email, password } = req.body;
+    console.log('at findUserByEmail');
     const user = findUserByEmail(email);
     if (!user) {
         return res.status(401).json({ error: 'Неверный email или пароль' });
     }
     console.log('email: ', email, 'password: ', password, 'user: ', user);
+    console.log('at bcrypt.compare');
     const valid = await bcrypt.compare(password, user.passwordHash);
     if (!valid) {
         return res.status(401).json({ error: 'Неверный email или пароль' });
     }
 
+    console.log('at generating token');
     const token = generateToken(user.id);
     res.json({
         token,
