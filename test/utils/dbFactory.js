@@ -1,5 +1,3 @@
-import pgp from 'pg-promise';
-
 const dbFactory = new class {
     constructor() {
         this.db = undefined;
