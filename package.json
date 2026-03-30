@@ -31,6 +31,7 @@
   "devDependencies": {
     "@types/jest": "^30.0.0",
     "@types/node": "^25.5.0",
+    "@types/pg-promise": "^0.0.28",
     "jest": "^30.3.0",
     "supertest": "^7.2.2"
   }

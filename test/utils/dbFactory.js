@@ -10,13 +10,13 @@ const dbFactory = new class {
         };
      }
 
-    async getDb() {
+    async getDb(initQueryFile) {
         if (!this.db) {    
-            const { default: getConnector,
-                    QueryFile } = await import('pg-promise');
-            this.db = getConnector()(this.dbConfigs);
-            const createSchemeQuery = new QueryFile('./createScheme.sql');
-            await this.db.none(createSchemeQuery);
+            const { default: getPgp } = await import('pg-promise');
+            const pgp = getPgp();
+            this.db = pgp(this.dbConfigs);
+            const initQuery = new pgp.QueryFile(initQueryFile);
+            await this.db.none(initQuery);
         }
         return this.db;
     }
