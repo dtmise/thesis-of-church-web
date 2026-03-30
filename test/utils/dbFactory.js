@@ -10,18 +10,17 @@ const dbFactory = new class {
         };
      }
 
-    getDb() {
-        if (!this.db) {
-            await (async () => {
-                const { default: getConnector,
-                     QueryFile } = await import('pg-promise');
-                this.db = getConnector()(this.dbConfigs);
-                const createSchemeQuery = new QueryFile('./createScheme.sql');
-                await this.db.none(createSchemeQuery);
-            })();
+    async getDb() {
+        if (!this.db) {    
+            const { default: getConnector,
+                    QueryFile } = await import('pg-promise');
+            this.db = getConnector()(this.dbConfigs);
+            const createSchemeQuery = new QueryFile('./createScheme.sql');
+            await this.db.none(createSchemeQuery);
         }
         return this.db;
     }
 }();
 
+console.log('dbFactory: export: ', dbFactory);
 export default dbFactory;
