@@ -10,11 +10,14 @@ import errorSupresser from './middleware/errorSupresser.js';
 
 let errorPasser;
 
-if (process.env.NODE_ENV !== 'test') {
+if (process.env.NODE_ENV === 'test') {
     errorPasser = fn => {
         return async (req, res, next) => {
-            console.log('inside errorPasser');
-            Promise().resolve(fn(req, res, next)).catch(next);
+            try {
+                fn(req, res, next);
+            } catch(err) {
+                next(err);
+            }
         }
     }
 } else {
