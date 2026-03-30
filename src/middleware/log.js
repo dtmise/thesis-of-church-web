@@ -8,7 +8,12 @@ const logMiddleware = (req, res, next) => {
         minute: '2-digit',
         second: '2-digit'
     });
-    console.log(timestamp, '::', req.method, req.path);
+    console.log(
+        timestamp, '::', 
+        req.method, 
+        req.path, '::',
+        'urlencoded and body arguments = ', req.body
+    );
     next();
 }
 

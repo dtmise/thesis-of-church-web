@@ -59,7 +59,7 @@ router.post('/login', async (req, res) => {
     if (!user) {
         return res.status(401).json({ error: 'Неверный email или пароль' });
     }
-
+    console.log('email: ', email, 'password: ', password, 'user: ', user);
     const valid = await bcrypt.compare(password, user.passwordHash);
     if (!valid) {
         return res.status(401).json({ error: 'Неверный email или пароль' });

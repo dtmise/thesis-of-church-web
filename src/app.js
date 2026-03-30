@@ -8,9 +8,9 @@ import newsRoutes    from './routes/news.js';
 
 const app = express();
 
-app.use(logMiddleware);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(logMiddleware);
 app.use('/api/auth', authRoutes);
 app.use(authMiddleware);
 

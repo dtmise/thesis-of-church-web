@@ -29,6 +29,8 @@
     "pg-promise": "^12.6.2"
   },
   "devDependencies": {
+    "@faker-js/faker": "^10.4.0",
+    "@types/faker": "^6.6.8",
     "@types/jest": "^30.0.0",
     "@types/node": "^25.5.0",
     "jest": "^30.3.0",
