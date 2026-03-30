@@ -4,7 +4,7 @@ import {
     createTeam, createUser, findUserByEmail,
     findTeamByName, findTeamById
 } from '../db.js';
-import { generateToken, authMiddleware } from '../middleware/auth.js';
+import { generateToken, authGuard } from '../middleware/authGuard.js';
 
 const router = Router();
 
@@ -79,7 +79,7 @@ router.post('/login', async (req, res) => {
     });
 });
 
-router.get('/me', authMiddleware, (req, res) => {
+router.get('/me', authGuard, (req, res) => {
     const user = req.user;
     const team = findTeamById(user.teamId);
     res.json({
