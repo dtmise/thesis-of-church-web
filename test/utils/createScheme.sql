@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS news;
-DROP TABLE IF EXISTS teams CASCADE;
 DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS teams;
  
 CREATE TABLE news (
     id              SERIAL       PRIMARY KEY,
@@ -11,7 +11,8 @@ CREATE TABLE news (
 
 CREATE TABLE teams (
     id              SERIAL       PRIMARY KEY,
-    name            VARCHAR(255) NOT NULL
+    name            VARCHAR(255) NOT NULL    UNIQUE,
+    score           INTEGER      DEFAULT 0
 );
 
 CREATE TABLE users (

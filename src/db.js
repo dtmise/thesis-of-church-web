@@ -1,77 +1,87 @@
-let teamIdCounter = 0;
-let userIdCounter = 0;
+import dbFactory from '../test/utils/dbFactory.js';
 
-const db = {
-    teams: [],
-    users: [],
-    news: [
-        {
-            id: 1,
-            title: "Старт регистрации",
-            content: "Регистрация открыта до 10 апреля.",
-            publishedAt: "2026-03-27T09:00:00Z"
-        },
-        {
-            id: 2,
-            title: "Обновление правил",
-            content: "Добавлены требования к командам.",
-            publishedAt: "2026-03-28T12:00:00Z"
-        }
-    ]
-};
+const db = await dbFactory.getDb('./createScheme.sql');
 
-export function createTeam(name) {
-    const team = { id: ++teamIdCounter, name };
-    db.teams.push(team);
-    return team;
+export async function createTeam(teamName) {
+    return db.one('INSERT INTO teams(name) VALUES($1:name) RETURNING id', [teamName]);
 }
 
-export function createUser({ fullName, group, email, passwordHash, teamId, role }) {
-    const user = { id: ++userIdCounter, fullName, group, email, passwordHash, teamId, role };
-    db.users.push(user);
-    return user;
+export async function createUser({ fullName, group, email, passwordHash, teamId, role }) {
+    const id = await db.one(`INSERT INTO users(name, university_group, email, password_hash, team_id, role) 
+        VALUES($<fullName>,$<group>,$<email>,$<passwordHash>,$<teamId>,$<role>) RETURNING id`,
+        { fullName, group, email, passwordHash, teamId, role }
+    )
+    return { id, fullName, group, email, passwordHash, teamId, role };
 }
 
-export function findUserByEmail(email) {
-    return db.users.find(u => u.email === email);
+export async function findUserByEmail(email) {
+    return db.one(`SELECT 
+        id, 
+        name AS "fullName",
+        university_group AS group, 
+        email, 
+        password_hash AS "passwordHash",
+        team_id AS "teamId",
+        role
+        FROM users WHERE email = $1`, [email]);
 }
 
-export function findUserById(id) {
-    return db.users.find(u => u.id === id);
+export async function findUserById(id) {
+        return db.one(`SELECT 
+        id, 
+        name AS "fullName",
+        university_group AS group, 
+        email, 
+        password_hash AS "passwordHash",
+        team_id AS "teamId",
+        role
+        FROM users WHERE id = $1`, [id]);
 }
 
-export function findTeamById(id) {
-    return db.teams.find(t => t.id === id);
+export async function findTeamById(id) {
+    return db.one(`SELECT * FROM teams WHERE id = $1`, [id]);
 }
 
-export function findTeamByName(name) {
-    return db.teams.find(t => t.name === name);
+export async function findTeamByName(name) {
+    return db.one(`SELECT * FROM teams WHERE name = $1`, [name]);
 }
 
-export function getTeamMembers(teamId) {
-    return db.users.filter(u => u.teamId === teamId);
+export async function getTeamMembers(teamId) {
+    return db.any(`SELECT 
+        id, 
+        name AS "fullName",
+        university_group AS group, 
+        email, 
+        password_hash AS "passwordHash",
+        team_id AS "teamId",
+        role
+        FROM users WHERE team_id = $1`, teamId);
 }
 
-export function getAllTeams() {
-    return db.teams.map(t => ({
-        id: t.id,
-        name: t.name,
-        membersCount: db.users.filter(u => u.teamId === t.id).length
-    }));
+export async function getAllTeams() {
+    return db.any('SELECT * FROM teams');
 }
 
-export function updateUser(id, updates) {
-    const user = db.users.find(u => u.id === id);
-    if (!user) return null;
-    if (updates.fullName !== undefined) user.fullName = updates.fullName;
-    if (updates.group !== undefined) user.group = updates.group;
-    return user;
+export async function updateUser(id, { newFullName, newGroup }) {
+    const user = await db.oneOrNone(
+        `UPDATE users 
+        SET name = COALESCE($1, name), 
+        unviersity_group = COALESCE($2, unviersity_group) 
+        WHERE id = $3 
+        RETURNING *`,
+        [newFullName, newGroup, id]
+    );
+    if (!user) {
+        return null;
+    } else {
+        return user;
+    }
 }
 
-export function getAllNews() {
-    return db.news;
+export async function getAllNews() {
+    return db.any('SELECT * FROM news');
 }
 
-export function findNewsById(id) {
-    return db.news.find(n => n.id === id);
+export async function findNewsById(id) {
+    return db.oneOrNone('SELECT * FROM news WHERE id = $1', [id]);
 }

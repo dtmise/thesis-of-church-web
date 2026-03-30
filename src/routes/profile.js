@@ -3,10 +3,10 @@ import { findTeamById, getTeamMembers, updateUser } from '../db.js';
 
 const router = Router();
 
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
     const user = req.user;
     const team = findTeamById(user.teamId);
-    const members = getTeamMembers(user.teamId).map(m => ({
+    const members = (await getTeamMembers(user.teamId)).map(m => ({
         id: m.id,
         fullName: m.fullName,
         group: m.group,
@@ -23,9 +23,9 @@ router.get('/', (req, res) => {
     });
 });
 
-router.put('/', (req, res) => {
+router.put('/', async (req, res) => {
     const { fullName, group } = req.body;
-    const updated = updateUser(req.user.id, { fullName, group });
+    const updated = await updateUser(req.user.id, { fullName, group });
     if (!updated) {
         return res.status(404).json({ error: 'Пользователь не найден' });
     }

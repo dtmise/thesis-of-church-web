@@ -1,22 +1,23 @@
 import pgp from 'pg-promise';
-
-let db;
+import { join as joinPath, dirname } from 'path';
+import { fileURLToPath } from 'url';
 
 beforeAll(async () => {
-    // const { default: dbDeleter } = await import('./utils/dbDeleter.mjs');
-    // await dbDeleter.deleteDb();
-    const dbConfigs = {
-        host: process.env.DB_HOST,
-        port: process.env.DB_PORT,
-        user: process.env.DB_USER,
-        database: process.env.DB_NAME,
-        password: process.env.DB_PASSWORD
-    };
-    db = pgp()(dbConfigs);
-    const query = new pgp.QueryFile('../../test/utils/createScheme.sql');
-    await db.none(query);
+     const resolveAbsolute = (relativePath) => {
+        const currentFileUrl = import.meta.url;
+        const currentFilePath = fileURLToPath(currentFileUrl);
+        const currentDirPath = dirname(currentFilePath);
+        return joinPath(currentDirPath, relativePath);
+    }
+    
+    // const queryAbsolutePath = resolveAbsolute('./utils/deleteDb.sql');
+    const db = globalThis.__DB__;
+    // const query = new pgp.QueryFile(queryAbsolutePath);
+    await db.none('TRUNCATE TABLE news, users, teams RESTART IDENTITY CASCADE;');
+    //await db.none(query);
 });
 
 afterAll(async () => {
-    db.$pool.end();
+    // const { default: dbDeleter } = await import('./utils/dbDeleter.mjs');
+    // await dbDeleter.deleteDb();
 })

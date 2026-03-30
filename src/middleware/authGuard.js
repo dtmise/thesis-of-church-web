@@ -9,7 +9,7 @@ export function generateToken(userId) {
     return jwt.sign({ userId }, JWT_SECRET, { expiresIn: '24h' });
 }
 
-export function authGuard(req, res, next) {
+export async function authGuard(req, res, next) {
     const authHeader = req.headers.authorization;
     console.log('authHeader', authHeader);
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -20,7 +20,7 @@ export function authGuard(req, res, next) {
     try {
         const decoded = jwt.verify(token, JWT_SECRET);
         console.log('decoded', decoded);
-        const user = findUserById(decoded.userId);
+        const user = await findUserById(decoded.userId);
         if (!user) {
             return res.status(401).json({ error: 'No such user' });
         }

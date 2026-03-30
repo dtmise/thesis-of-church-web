@@ -19,23 +19,25 @@ router.post('/register-team', async (req, res) => {
         return res.status(400).json({ error: 'Команда: от 1 до 3 участников' });
     }
 
-    if (findTeamByName(teamName)) {
+    const foundTeam = findTeamByName(teamName);
+    if (foundTeam) {
         return res.status(409).json({ error: 'Название команды уже занято' });
     }
 
     for (const m of members) {
-        if (findUserByEmail(m.email)) {
+        const user = await findUserByEmail(m.email);
+        if (user) {
             return res.status(409).json({ error: `Email ${m.email} уже занят` });
         }
     }
 
-    const team = createTeam(teamName);
+    const team = await createTeam(teamName);
     const users = [];
 
     for (let i = 0; i < members.length; i++) {
         const m = members[i];
         const passwordHash = await bcrypt.hash(m.password, 10);
-        const user = createUser({
+        const user = await createUser({
             fullName: m.fullName,
             group: m.group,
             email: m.email,
@@ -55,7 +57,7 @@ router.post('/register-team', async (req, res) => {
 
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
-    const user = findUserByEmail(email);
+    const user = await findUserByEmail(email);
     if (!user) {
         return res.status(401).json({ error: 'Неверный email или пароль' });
     }
@@ -78,9 +80,9 @@ router.post('/login', async (req, res) => {
     });
 });
 
-router.get('/me', authGuard, (req, res) => {
+router.get('/me', async (req, res) => {
     const user = req.user;
-    const team = findTeamById(user.teamId);
+    const team = await findTeamById(user.teamId);
     res.json({
         id: user.id,
         fullName: user.fullName,

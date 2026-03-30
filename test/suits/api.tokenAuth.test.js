@@ -1,19 +1,30 @@
 import getAgent from 'supertest';
+import registerTeamAndGetToken from './util/registerTeamAndGetToken';
+import registerTeam from './util/registerTeam';
+import logInUserAndGetToken from './util/logInUserAndGetToken';
 
 const port  = process.env.PORT;
 const agent = await getAgent(`http://localhost:${port}`);
 const url   = '/api/auth/me';
 
 describe(`API: GET ${url}`, () => {
-    let token;
+    let preparedUser, token;
 
     beforeAll(async () => {
-        const res = await agent
-            .post('/api/auth/login')
-            .set('Content-Type', 'application/json')
-            .send({ email: 'ivan@example.com', password: 'StrongPass123!' });
-
-        token = res.body.token;
+        const teamData = await registerTeam(agent);
+        const teamName = teamData.teamName;
+        user = teamData.members[0];
+        preparedUser = { 
+            ...user, 
+            id: expect.any(Number), 
+            role: 'captain', 
+            team: {
+                id: expect.any(Number),
+                name: teamName
+            }
+        };
+        delete preparedUser.password;
+        token = await logInUserAndGetToken(agent, user.email, user.password);
     });
 
     it('returns current user with valid token', async () => {
@@ -23,17 +34,7 @@ describe(`API: GET ${url}`, () => {
             .expect(200)
             .expect('Content-Type', /json/);
 
-        expect(res.body).toEqual({
-            id: expect.any(Number),
-            fullName: 'Иванов Иван Иванович',
-            group: '25201',
-            email: 'ivan@example.com',
-            role: 'captain',
-            team: {
-                id: 1,
-                name: 'RegisterTeamTest'
-            }
-        });
+        expect(res.body).toEqual(preparedUser);
     });
 
     it('returns 401 with no token', async () => {
