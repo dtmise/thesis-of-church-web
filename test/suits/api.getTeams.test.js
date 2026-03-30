@@ -1,4 +1,5 @@
 import getAgent from 'supertest';
+import registerTeam from '../utils/registerTeam.js';
 
 const port  = process.env.PORT;
 const agent = await getAgent(`http://localhost:${port}`);
@@ -7,12 +8,14 @@ describe('GET /api/teams', () => {
     let token;
 
     beforeAll(async () => {
+        const user = await registerTeam(agent);
         const res = await agent
             .post('/api/auth/login')
             .set('Content-Type', 'application/json')
-            .send({ email: 'ivan@example.com', password: 'StrongPass123!' });
+            .send({ email: user.email, passwordHash: user.passwordHash });
 
         token = res.body.token;
+        console.log('token', token);
     });
 
     it('get list of teams', async () => {

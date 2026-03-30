@@ -18,8 +18,8 @@ CREATE TABLE users (
     id              SERIAL       PRIMARY KEY,
     name            VARCHAR(255) NOT NULL,
     email           VARCHAR(255) NOT NULL    UNIQUE,
-    group           VARCHAR(255) NOT NULL,
+    university_group VARCHAR(255) NOT NULL,
     password_hash   TEXT         NOT NULL,
-    role            VARCHAR(50)  NOT NULL
+    role            VARCHAR(50)  NOT NULL,
     team_id         INTEGER      REFERENCES teams(id) ON DELETE SET NULL
 );
