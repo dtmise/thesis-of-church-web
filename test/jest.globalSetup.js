@@ -17,9 +17,11 @@ export default async (globalConfig, projectConfig) => {
     const db = await dbFactory.getDb(initQueryAbsolutePath);
     globalThis.__DB__ = db;
     
-    // const { default: serverFactory } = await import('./utils/serverFactory.mjs');
-    // const server = serverFactory.getServer();
-    // globalThis.__SERVER__ = server;
+    const serverFactoryAbsolutePath = resolveAbsolute('./utils/serverFactory.js');
+    const serverFactoryUrl = pathToFileURL(serverFactoryAbsolutePath);
+    const { default: serverFactory } = await import(serverFactoryUrl);
+    const server = serverFactory.getServer();
+    globalThis.__SERVER__ = server;
 
     // const { default: app } = await import('../src/app.js');
     // const port = process.env.PORT;
