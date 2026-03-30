@@ -10,7 +10,7 @@ import errorSupresser from './middleware/errorSupresser.js';
 
 let errorPasser;
 
-if (process.env.NODE_ENV === 'test') {
+if (process.env.NODE_ENV !== 'test') {
     errorPasser = fn => {
         return async (req, res, next) => {
             try {
@@ -34,7 +34,6 @@ app.use(errorPasser(authGuard));
 app.use('/api/profile', errorPasser(profileRoutes));
 app.use('/api/teams', errorPasser(teamsRoutes));
 app.use('/api/news', errorPasser(newsRoutes));
-app.use(errorPasser(outputLogMiddleware));
 
 if (process.env.NODE_ENV !== 'test') {
     app.use(errorSupresser);

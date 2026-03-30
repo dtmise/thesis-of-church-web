@@ -1,22 +1,19 @@
 import getAgent from 'supertest';
 import registerTeam from './util/registerTeam.js';
+import loginUserAndGetToken from './util/logInUserAndGetToken.js';
 
 const port  = process.env.PORT;
 const agent = await getAgent(`http://localhost:${port}`);
 
 describe('GET /api/teams', () => {
-    let token;
+    let teamName, members, token;
 
     beforeAll(async () => {
-        const teamAndUsers = await registerTeam(agent);
-        const user = teamAndUsers.members[0];
-        const res = await agent
-            .post('/api/auth/login')
-            .set('Content-Type', 'application/json')
-            .send({ email: user.email, password: user.password });
-
-        token = res.body.token;
-        console.log('token', token);
+        const teamData = await registerTeam(agent);
+        teamName = teamData.teamName;
+        members = teamData.members;
+        const user = members[0];
+        token = await loginUserAndGetToken(agent, user.email, user.password);
     });
 
     it('get list of teams', async () => {
@@ -28,8 +25,8 @@ describe('GET /api/teams', () => {
         expect(res.body).toEqual([
             {
                 "id": expect.any(Number),
-                "name": "RegisterTeamTest",
-                "membersCount": 3
+                "name": teamName,
+                "membersCount": members.length
             }
         ]);
     });

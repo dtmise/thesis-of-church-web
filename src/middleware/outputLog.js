@@ -12,7 +12,7 @@ const outputLogMiddleware = (req, res, next) => {
         'OUTPUT: ',
         timestamp, '::', 
         res.status, 
-        'body = ', res.body
+        'body = ', res.body()
     );
     next();
 }
