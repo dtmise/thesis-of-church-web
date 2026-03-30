@@ -3,14 +3,12 @@ const serverFactory = new class {
         this.server = undefined;
     }
 
-    getServer() {
-        if (!this.server) {
-            await (async () => {
-                const { default: app } = await import('../src/app.js');
-                const port = process.env.PORT;
-                this.server = await app.listen(port);
-                await new Promise(res => server.on('listening', res));
-            })();
+    async getServer() {
+        if (!this.server) {            
+            const { default: app } = await import('../../src/app.js');
+            const port = process.env.PORT;
+            this.server = app.listen(port);
+            await new Promise(res => this.server.on('listening', res));
         }
         return this.server;
     }

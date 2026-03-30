@@ -20,7 +20,7 @@ export default async (globalConfig, projectConfig) => {
     const serverFactoryAbsolutePath = resolveAbsolute('./utils/serverFactory.js');
     const serverFactoryUrl = pathToFileURL(serverFactoryAbsolutePath);
     const { default: serverFactory } = await import(serverFactoryUrl);
-    const server = serverFactory.getServer();
+    const server = await serverFactory.getServer();
     globalThis.__SERVER__ = server;
 
     // const { default: app } = await import('../src/app.js');
