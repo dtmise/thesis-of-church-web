@@ -21,7 +21,7 @@ router.get('/', async (req, res) => {
         group: user.group,
         email: user.email,
         role: user.role,
-        team: team ? { id: team.id, name: team.name, members } : null
+        team
     });
 });
 

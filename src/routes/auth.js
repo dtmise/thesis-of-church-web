@@ -9,6 +9,7 @@ import { generateToken, authGuard } from '../middleware/authGuard.js';
 const router = Router();
 
 router.post('/register-team', async (req, res) => {
+    console.log('inside register-team');
     const { teamName, members } = req.body;
 
     if (!teamName || !members || !Array.isArray(members)) {
@@ -47,11 +48,15 @@ router.post('/register-team', async (req, res) => {
         });
         users.push({ id: user.id, fullName: user.fullName, email: user.email });
     }
+    const captain = users[0],
+          token   = generateToken(captain.id);
 
     res.status(201).json({
-        message: 'Команда успешно зарегистрирована',
-        team: { id: team.id, name: team.name },
-        users
+        team,
+        users,
+        token,
+        user: captain,
+        message: 'Команда успешно зарегистрирована'
     });
 });
 

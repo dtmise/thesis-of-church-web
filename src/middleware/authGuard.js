@@ -28,13 +28,16 @@ export async function authGuard(req, res, next) {
     try {
         const decoded = jwt.verify(token, JWT_SECRET);
         console.log('decoded', decoded);
+        console.log('before findUserById');
         const user = await findUserById(decoded.userId);
+        console.log('after findUserById, user = ', user);
         if (!user) {
             return res.status(401).json({ error: 'No such user' });
         }
         req.user = user;
         next();
-    } catch {
+    } catch (err) {
+        console.log('error catched', err.name, err.message);
         return res.status(401).json({ error: 'Unauthorized' });
     }
 }
