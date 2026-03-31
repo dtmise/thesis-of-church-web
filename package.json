@@ -19,6 +19,8 @@
   "type": "module",
   "main": "src/server.js",
   "scripts": {
+    "prod": "node --env-file=sns/prod.env src/server.js",
+    "dev": "node --env-file=sns/dev.env src/server.js",
     "start": "node src/server.js",
     "test": "node --experimental-vm-modules node_modules/.bin/jest --config ./test/jest.config.js  --runInBand"
   },
