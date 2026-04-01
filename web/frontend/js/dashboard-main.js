@@ -7,7 +7,6 @@ requireAuth();
 
 // Загрузка данных
 async function loadDashboard() {
-    console.log('inside load dashboard');
     try {
         await Promise.all([
             loadProfile(),
@@ -57,7 +56,6 @@ async function loadProfile() {
 
 // Загрузка информации о команде пользователя
 async function loadMyTeam() {
-    console.log('inside loadMyTeam');
     const teamContainer = document.getElementById('my-team-info');
     
     try {
@@ -201,6 +199,5 @@ if (logoutBtn) {
 // Настройка редактирования
 setupProfileEditing();
 
-console.log('before loadDashboard');
 // Загрузка данных
 loadDashboard();

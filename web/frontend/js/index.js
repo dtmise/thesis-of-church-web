@@ -63,19 +63,19 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             <div class="form-group">
                 <label>ФИО *</label>
-                <input type="text" class="member-fullname" placeholder="Иванов Иван Иванович" required>
+                <input type="text" class="member-fullname" placeholder="Фамилия, имя и отчество участника" required>
             </div>
             <div class="form-group">
                 <label>Группа *</label>
-                <input type="text" class="member-group" placeholder="ИУ5-51Б" required>
+                <input type="text" class="member-group" placeholder="Номер группы участника" required>
             </div>
             <div class="form-group">
                 <label>Email *</label>
-                <input type="email" class="member-email" placeholder="example@mail.com" required>
+                <input type="email" class="member-email" placeholder="example@mail.ru" required>
             </div>
             <div class="form-group">
                 <label>Пароль *</label>
-                <input type="password" class="member-password" placeholder="минимум 6 символов" required minlength="6">
+                <input type="password" class="member-password" placeholder="Минимум 6 символов" required minlength="6">
             </div>
         `;
         
