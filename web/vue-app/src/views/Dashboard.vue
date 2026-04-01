@@ -353,6 +353,7 @@ async function saveProfile() {
     await api.updateProfile({ fullName: editForm.value.fullName, group: editForm.value.group })
     await api.updateEmail(editForm.value.email)
     await loadData()
+    editOpen.value = false
     notify('Профиль обновлён!', 'success')
   } catch (e) {
     notify(e.message || 'Ошибка обновления', 'error')
@@ -363,6 +364,7 @@ async function changePassword() {
   try {
     await api.updatePassword(pwForm.value.oldPassword, pwForm.value.newPassword)
     pwForm.value = { oldPassword: '', newPassword: '' }
+    editOpen.value = false
     notify('Пароль обновлён!', 'success')
   } catch (e) {
     notify(e.message || 'Ошибка смены пароля', 'error')
@@ -373,6 +375,7 @@ async function changeTeamName() {
   try {
     await api.updateTeamName(teamNameEdit.value)
     await loadData()
+    editOpen.value = false
     notify('Название обновлено!', 'success')
   } catch (e) {
     notify(e.message || 'Ошибка обновления', 'error')
