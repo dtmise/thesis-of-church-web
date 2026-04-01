@@ -31,5 +31,6 @@ CREATE TABLE users (
     university_group VARCHAR(255) NOT NULL,
     password_hash   TEXT         NOT NULL,
     role            VARCHAR(50),
+    is_admin        BOOLEAN      DEFAULT false,
     team_id         INTEGER      REFERENCES teams(id) ON DELETE SET NULL
 );

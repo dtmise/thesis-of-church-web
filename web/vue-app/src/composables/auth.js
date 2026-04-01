@@ -15,9 +15,9 @@ export const auth = reactive({
   },
 
   async logout() {
-    await api.logout()
     this.user = null
     localStorage.removeItem('user')
+    api.logout().catch(() => {})
   },
 
   async login(email, password) {

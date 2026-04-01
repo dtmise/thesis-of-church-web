@@ -9,14 +9,14 @@
       <form class="contact-form" @submit.prevent="submit">
         <div class="form-group">
           <label>Telegram</label>
-          <input v-model="form.telegram" type="text" placeholder="@username">
+          <input v-model="form.telegram" ref="telegramInput" type="text" placeholder="@username">
         </div>
         <div class="form-group">
           <label>VK</label>
           <input v-model="form.vk" type="text" placeholder="vk.com/id или @username">
         </div>
-        <div class="input-hint" style="margin-bottom: 12px; text-align: center;">Заполните хотя бы одно поле</div>
-        <button type="submit" class="btn-submit">Продолжить</button>
+        <div class="input-hint" style="margin-bottom: 0; text-align: center;">Заполните хотя бы одно поле</div>
+        <button type="submit" class="btn-submit" style="margin-top: 8px;">Продолжить</button>
       </form>
       <div class="contact-modal-footer">
         <p>Присоединяйтесь к нам</p>
@@ -36,22 +36,27 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import { api } from '../composables/api'
 import { useNotification } from '../composables/notification'
 
 const show = ref(false)
 const form = ref({ telegram: '', vk: '' })
 const { show: notify } = useNotification()
+const telegramInput = ref(null)
 
-onMounted(() => {
+onMounted(async () => {
   if (!localStorage.getItem('contactSubmitted') && !localStorage.getItem('hasLoggedIn')) {
     show.value = true
+    await nextTick()
+    document.querySelector('.auth-wrapper')?.setAttribute('inert', '')
+    telegramInput.value?.focus()
   }
 })
 
 function close() {
   show.value = false
+  document.querySelector('.auth-wrapper')?.removeAttribute('inert')
 }
 
 async function submit() {
@@ -66,6 +71,7 @@ async function submit() {
     await api.submitContact({ telegram, vk })
     localStorage.setItem('contactSubmitted', '1')
     show.value = false
+    document.querySelector('.auth-wrapper')?.removeAttribute('inert')
   } catch (e) {
     notify(e.message || 'Ошибка отправки', 'error')
   }

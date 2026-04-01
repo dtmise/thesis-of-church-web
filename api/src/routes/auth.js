@@ -64,7 +64,8 @@ router.post('/login', async (req, res) => {
             email: user.email,
             group: user.group,
             teamId: user.teamId,
-            role: user.role
+            role: user.role,
+            isAdmin: user.isAdmin
         }
     });
 });
@@ -99,6 +100,7 @@ router.get('/me', authGuard, async (req, res) => {
         group: user.group,
         email: user.email,
         role: user.role,
+        isAdmin: user.isAdmin,
         team
     });
 });
