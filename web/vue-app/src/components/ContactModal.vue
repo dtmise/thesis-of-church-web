@@ -1,15 +1,12 @@
 <template>
-  <div v-if="show" class="contact-overlay" @click.self="() => {}">
+  <div v-if="show" class="contact-overlay" @click.self="close">
     <div class="contact-modal">
+      <button class="contact-close" @click="close" aria-label="Закрыть">&times;</button>
       <div class="contact-modal-header">
         <h2>Добро пожаловать!</h2>
         <p>Оставьте свой контакт, чтобы мы могли держать вас в курсе</p>
       </div>
       <form class="contact-form" @submit.prevent="submit">
-        <div class="form-group">
-          <label>Email</label>
-          <input v-model="form.email" type="email" placeholder="example@mail.com">
-        </div>
         <div class="form-group">
           <label>Telegram</label>
           <input v-model="form.telegram" type="text" placeholder="@username">
@@ -31,7 +28,7 @@
           </a>
           <a href="https://vk.com/church_turing_thesis" target="_blank" rel="noopener" class="social-btn social-vk">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5.01 13.35h-1.3c-.5 0-.65-.4-1.54-1.3-.78-.75-1.12-.85-1.31-.85-.27 0-.35.08-.35.45v1.19c0 .32-.1.51-1 .51-1.47 0-3.1-.89-4.25-2.56-1.73-2.43-2.2-4.26-2.2-4.63 0-.19.08-.36.45-.36h1.3c.34 0 .46.15.59.51.65 1.9 1.74 3.56 2.19 3.56.17 0 .24-.08.24-.51V9.93c-.05-.88-.52-.95-.52-1.26 0-.15.13-.31.33-.31h2.04c.28 0 .38.15.38.49v2.58c0 .28.13.38.21.38.17 0 .31-.1.62-.41.96-1.07 1.64-2.73 1.64-2.73.09-.19.24-.36.58-.36h1.3c.39 0 .48.2.39.49-.17.77-1.81 3.1-1.81 3.1-.14.23-.2.34 0 .6.14.19.62.6.94.97.59.67 1.05 1.23 1.17 1.62.13.38-.07.58-.45.58z" fill="currentColor"/></svg>
-            VKontakte
+            VK
           </a>
         </div>
       </div>
@@ -45,22 +42,26 @@ import { api } from '../composables/api'
 
 const show = ref(false)
 const error = ref('')
-const form = ref({ email: '', telegram: '', vk: '' })
+const form = ref({ telegram: '', vk: '' })
 
 onMounted(() => {
-  if (!localStorage.getItem('contactSubmitted')) {
+  if (!localStorage.getItem('contactSubmitted') && !localStorage.getItem('hasLoggedIn')) {
     show.value = true
   }
 })
 
+function close() {
+  show.value = false
+}
+
 async function submit() {
-  const { email, telegram, vk } = form.value
-  if (!email && !telegram && !vk) {
+  const { telegram, vk } = form.value
+  if (!telegram && !vk) {
     error.value = 'Заполните хотя бы одно поле'
     return
   }
   try {
-    await api.submitContact({ email, telegram, vk })
+    await api.submitContact({ telegram, vk })
     localStorage.setItem('contactSubmitted', '1')
     show.value = false
   } catch (e) {
@@ -91,12 +92,15 @@ async function submit() {
   animation: modalIn 0.35s ease;
 }
 @keyframes modalIn { from { opacity:0; transform: scale(0.96) translateY(8px); } to { opacity:1; transform: scale(1) translateY(0); } }
-.contact-modal-header { padding: 36px 32px 20px; text-align: center; }
-.contact-modal-header h2 { font-size: 24px; font-weight: 700; letter-spacing: -0.4px; margin-bottom: 8px; }
-.contact-modal-header p { font-size: 14px; color: var(--text-secondary); line-height: 1.5; }
-.contact-form { padding: 8px 32px 24px; }
-.contact-modal-footer { padding: 0 32px 32px; text-align: center; }
-.contact-modal-footer > p { font-size: 12px; color: var(--text-tertiary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; }
+.contact-modal { position: relative; }
+.contact-close { position: absolute; top: 10px; right: 14px; background: none; border: none; font-size: 24px; color: var(--text-tertiary); cursor: pointer; padding: 4px 8px; line-height: 1; border-radius: 6px; transition: background 0.15s; }
+.contact-close:hover { background: var(--bg-hover, rgba(0,0,0,0.06)); color: var(--text-primary); }
+.contact-modal-header { padding: 24px 32px 12px; text-align: center; }
+.contact-modal-header h2 { font-size: 22px; font-weight: 700; letter-spacing: -0.4px; margin-bottom: 4px; }
+.contact-modal-header p { font-size: 14px; color: var(--text-secondary); line-height: 1.4; }
+.contact-form { padding: 4px 32px 16px; }
+.contact-modal-footer { padding: 0 32px 24px; text-align: center; }
+.contact-modal-footer > p { font-size: 12px; color: var(--text-tertiary); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; }
 .social-row { display: flex; gap: 10px; justify-content: center; }
 .social-btn { display: inline-flex; align-items: center; gap: 8px; padding: 8px 18px; border-radius: var(--radius-pill); font-size: 13px; font-weight: 500; text-decoration: none; border: 1px solid var(--border); color: var(--text-primary); background: var(--bg); transition: all 0.2s ease; }
 .social-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow); }

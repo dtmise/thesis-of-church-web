@@ -121,10 +121,10 @@ export async function updateUserPassword(userId, newPasswordHash) {
     );
 }
 
-export async function saveContact({ email, telegram, vk }) {
+export async function saveContact({ telegram, vk }) {
     return db.one(
-        'INSERT INTO contacts(email, telegram, vk) VALUES($1, $2, $3) RETURNING *',
-        [email || null, telegram || null, vk || null]
+        'INSERT INTO contacts(telegram, vk) VALUES($1, $2) RETURNING *',
+        [telegram || null, vk || null]
     );
 }
 

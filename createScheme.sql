@@ -5,7 +5,6 @@ DROP TABLE IF EXISTS teams;
 
 CREATE TABLE contacts (
     id              SERIAL       PRIMARY KEY,
-    email           VARCHAR(255),
     telegram        VARCHAR(255),
     vk              VARCHAR(255),
     created_at      TIMESTAMP    NOT NULL    DEFAULT NOW()

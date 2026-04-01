@@ -12,7 +12,7 @@
       <div class="blocks-container">
         <!-- Profile -->
         <div class="info-block profile-block">
-          <div class="block-icon">👤</div>
+          <div class="block-icon">П</div>
           <h2>Мой профиль</h2>
           <div v-if="profile" class="profile-info">
             <p><strong>ФИО:</strong> <span>{{ profile.fullName }}</span></p>
@@ -26,14 +26,30 @@
 
         <!-- Team (has team) -->
         <div v-if="profile?.team" class="info-block team-block">
-          <div class="block-icon">👥</div>
+          <div class="block-icon">К</div>
           <h2>Моя команда</h2>
           <div class="team-details">
-            <h3>{{ profile.team.name }}</h3>
+            <div class="team-header-row">
+              <div v-if="editingTeamName" class="team-name-edit">
+                <form @submit.prevent="changeTeamName" class="team-name-form">
+                  <input v-model="teamNameEdit" type="text" required class="team-name-input" @keydown.esc="editingTeamName = false">
+                  <button type="submit" class="btn-save-name">✓</button>
+                  <button type="button" class="btn-cancel-sm" @click="editingTeamName = false">✕</button>
+                </form>
+              </div>
+              <div v-else class="team-name-display">
+                <h3>{{ profile.team.name }}</h3>
+                <button v-if="profile.role === 'captain'" class="btn-edit-name" @click="startEditTeamName">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+                </button>
+              </div>
+              <span :class="['team-badge', profile.role === 'captain' ? 'badge-captain' : 'badge-member']">
+                {{ profile.role === 'captain' ? 'Капитан' : 'Участник' }}
+              </span>
+            </div>
             <div class="team-stats">
               <p><strong>Участников:</strong> {{ profile.team.members?.length || 0 }} / 3</p>
             </div>
-            <span class="team-badge">{{ profile.role === 'captain' ? 'Вы капитан' : 'Вы участник' }}</span>
 
             <!-- Invite link (captain only, hide when team full) -->
             <div v-if="profile.role === 'captain' && profile.team.invite_code && (profile.team.members?.length || 0) < 3" class="invite-section">
@@ -50,7 +66,7 @@
               <h4>Участники</h4>
               <div v-for="m in profile.team.members" :key="m.id" class="team-member-row">
                 <span class="member-name">{{ m.fullName }}</span>
-                <span class="member-role-badge">{{ m.role === 'captain' ? '👑' : '👤' }}</span>
+                <span v-if="m.role === 'captain'" class="member-role-badge">капитан</span>
                 <span class="member-group">{{ m.group }}</span>
               </div>
             </div>
@@ -67,7 +83,7 @@
 
         <!-- Team (no team) -->
         <div v-else-if="profile && !profile.team" class="info-block team-block">
-          <div class="block-icon">👥</div>
+          <div class="block-icon">К</div>
           <h2>Команда</h2>
           <div class="no-team-section">
             <p class="empty-state-text">Одному, конечно, тоже можно, но вместе — веселее и эффективнее!</p>
@@ -103,7 +119,7 @@
 
         <!-- News -->
         <div class="info-block news-block">
-          <div class="block-icon">📰</div>
+          <div class="block-icon">Н</div>
           <h2>Новости</h2>
           <div v-if="news.length" class="news-list">
             <div v-for="item in news" :key="item.id" class="news-card">
@@ -115,9 +131,22 @@
             </div>
           </div>
           <div v-else-if="!loading" class="empty-state">
-            <p>📭 Новостей пока нет</p>
+            <p>Новостей пока нет</p>
           </div>
           <div v-else class="loading-spinner">Загрузка...</div>
+          <div class="news-socials">
+            <p class="news-socials-text">Следите за новостями также здесь</p>
+            <div class="news-socials-row">
+              <a href="https://t.me/+2UInlPHybzhjYzRi" target="_blank" rel="noopener" class="news-social-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.53-.47-.01-1.38-.27-2.06-.49-.83-.27-1.49-.42-1.43-.88.03-.24.37-.49 1.02-.74 4-1.73 6.67-2.88 8.02-3.45 3.82-1.6 4.62-1.87 5.13-1.88.11 0 .37.03.53.17.14.12.18.28.2.45-.01.06.01.24 0 .37z" fill="currentColor"/></svg>
+                Telegram
+              </a>
+              <a href="https://vk.com/church_turing_thesis" target="_blank" rel="noopener" class="news-social-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5.01 13.35h-1.3c-.5 0-.65-.4-1.54-1.3-.78-.75-1.12-.85-1.31-.85-.27 0-.35.08-.35.45v1.19c0 .32-.1.51-1 .51-1.47 0-3.1-.89-4.25-2.56-1.73-2.43-2.2-4.26-2.2-4.63 0-.19.08-.36.45-.36h1.3c.34 0 .46.15.59.51.65 1.9 1.74 3.56 2.19 3.56.17 0 .24-.08.24-.51V9.93c-.05-.88-.52-.95-.52-1.26 0-.15.13-.31.33-.31h2.04c.28 0 .38.15.38.49v2.58c0 .28.13.38.21.38.17 0 .31-.1.62-.41.96-1.07 1.64-2.73 1.64-2.73.09-.19.24-.36.58-.36h1.3c.39 0 .48.2.39.49-.17.77-1.81 3.1-1.81 3.1-.14.23-.2.34 0 .6.14.19.62.6.94.97.59.67 1.05 1.23 1.17 1.62.13.38-.07.58-.45.58z" fill="currentColor"/></svg>
+                VK
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </main>
@@ -159,16 +188,7 @@
           <button type="submit" class="btn-primary">Сменить пароль</button>
         </form>
 
-        <template v-if="profile?.role === 'captain'">
-          <hr class="modal-divider">
-          <h3>Название команды</h3>
-          <form @submit.prevent="changeTeamName">
-            <div class="form-group">
-              <label>Новое название</label>
-              <input v-model="teamNameEdit" type="text" required>
-            </div>
-            <button type="submit" class="btn-primary">Сохранить</button>
-          </form>
+        <template v-if="false">
         </template>
       </div>
     </div>
@@ -176,7 +196,7 @@
     <!-- Confirm popup -->
     <div v-if="confirmAction" class="modal" style="display:flex;" @click.self="confirmAction = null">
       <div class="confirm-popup">
-        <div class="confirm-icon">⚠️</div>
+        <div class="confirm-icon">!</div>
         <h3>{{ confirmAction === 'delete' ? 'Удалить команду?' : 'Покинуть команду?' }}</h3>
         <p class="confirm-text">
           {{ confirmAction === 'delete'
@@ -215,6 +235,7 @@ const newTeamName = ref('')
 const joinCode = ref('')
 const copied = ref(false)
 const confirmAction = ref(null)
+const editingTeamName = ref(false)
 
 // Edit modal state
 const editOpen = ref(false)
@@ -375,11 +396,16 @@ async function changeTeamName() {
   try {
     await api.updateTeamName(teamNameEdit.value)
     await loadData()
-    editOpen.value = false
+    editingTeamName.value = false
     notify('Название обновлено!', 'success')
   } catch (e) {
     notify(e.message || 'Ошибка обновления', 'error')
   }
+}
+
+function startEditTeamName() {
+  teamNameEdit.value = profile.value?.team?.name || ''
+  editingTeamName.value = true
 }
 
 function onLogout() {
@@ -394,6 +420,41 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.news-socials {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+.news-socials-text {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  margin-bottom: 10px;
+}
+.news-socials-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+.news-social-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  background: var(--bg);
+  transition: all 0.2s ease;
+}
+.news-social-btn:hover {
+  color: var(--text-primary);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
 .modal {
   display: flex;
   align-items: center;
@@ -404,28 +465,120 @@ onMounted(async () => {
   overflow-y: auto;
 }
 .modal-divider {
-  margin: 24px 0;
+  margin: 16px 0;
   border: none;
   border-top: 1px solid var(--border);
 }
 .no-team-section {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 14px;
 }
 .empty-state-text {
   color: var(--secondary);
   text-align: center;
   margin: 0;
 }
+.team-name-display {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+}
+.team-name-display h3 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+.btn-edit-name {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px;
+  opacity: 0.4;
+  transition: opacity 0.2s;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  color: var(--text-secondary);
+}
+.btn-edit-name:hover {
+  opacity: 1;
+}
+.team-name-edit {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+.team-name-form {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  width: 100%;
+}
+.team-name-input {
+  flex: 1;
+  padding: 0 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  font-family: var(--font);
+  min-width: 0;
+  height: 28px;
+  line-height: 28px;
+}
+.team-name-input:focus {
+  outline: none;
+  border-color: var(--accent-secondary);
+}
+.btn-save-name {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.btn-cancel-sm {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.btn-cancel-sm:hover {
+  background: var(--bg);
+}
 .team-action-card {
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 20px;
+  padding: 14px;
 }
 .team-action-card h3 {
-  margin: 0 0 12px 0;
+  margin: 0 0 8px 0;
   font-size: 1rem;
 }
 .team-action-card form {
@@ -440,7 +593,9 @@ onMounted(async () => {
   align-self: flex-start;
 }
 .invite-section {
-  margin-top: 16px;
+  margin: 14px 0;
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
 }
 .invite-link-row {
   display: flex;
@@ -476,17 +631,19 @@ onMounted(async () => {
   border-color: #4EA0FF;
 }
 .team-members-list {
-  margin-top: 20px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
 }
 .team-members-list h4 {
-  margin: 0 0 10px 0;
+  margin: 0 0 6px 0;
   font-size: 0.95rem;
 }
 .team-member-row {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 0;
+  padding: 5px 0;
   border-bottom: 1px solid var(--border);
 }
 .team-member-row:last-child {
@@ -497,14 +654,19 @@ onMounted(async () => {
   flex: 1;
 }
 .member-role-badge {
-  font-size: 1rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  background: var(--bg);
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-weight: 500;
 }
 .member-group {
   color: var(--secondary);
   font-size: 0.9rem;
 }
 .btn-danger-sm {
-  margin-top: 20px;
+  margin-top: 12px;
   padding: 6px 14px;
   border: 1px solid #e53935;
   border-radius: 8px;
@@ -519,7 +681,7 @@ onMounted(async () => {
   background: rgba(229, 57, 53, 0.08);
 }
 .btn-danger-outline-sm {
-  margin-top: 20px;
+  margin-top: 12px;
   padding: 6px 14px;
   border: 1px solid rgba(229, 57, 53, 0.3);
   border-radius: 8px;
@@ -536,15 +698,24 @@ onMounted(async () => {
 .confirm-popup {
   background: var(--surface);
   border-radius: 16px;
-  padding: 32px;
+  padding: 24px;
   max-width: 380px;
   width: 90%;
   text-align: center;
   box-shadow: 0 20px 60px rgba(0,0,0,0.15);
 }
 .confirm-icon {
-  font-size: 2.5rem;
-  margin-bottom: 12px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #e53935;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(229, 57, 53, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
 }
 .confirm-popup h3 {
   margin: 0 0 8px 0;
@@ -553,7 +724,7 @@ onMounted(async () => {
 .confirm-text {
   color: var(--secondary);
   font-size: 0.9rem;
-  margin: 0 0 24px 0;
+  margin: 0 0 16px 0;
   line-height: 1.5;
 }
 .confirm-actions {

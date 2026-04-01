@@ -6,7 +6,7 @@
       <!-- Hero -->
       <div class="hero-section">
         <h1 class="hero-title">Church-Turing<br>Thesis</h1>
-        <p class="hero-subtitle">Конкурс по программированию</p>
+        <p class="hero-subtitle">Хакатон по математической логике</p>
         <div class="hero-social">
           <a href="https://t.me/+2UInlPHybzhjYzRi" target="_blank" rel="noopener" class="hero-social-link">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.53-.47-.01-1.38-.27-2.06-.49-.83-.27-1.49-.42-1.43-.88.03-.24.37-.49 1.02-.74 4-1.73 6.67-2.88 8.02-3.45 3.82-1.6 4.62-1.87 5.13-1.88.11 0 .37.03.53.17.14.12.18.28.2.45-.01.06.01.24 0 .37z" fill="currentColor"/></svg>
@@ -36,7 +36,7 @@
             </div>
             <div class="form-group">
               <label>Группа</label>
-              <input v-model="regForm.group" type="text" placeholder="ИУ5-51Б" required>
+              <input v-model="regForm.group" type="text" placeholder="23212" required>
             </div>
             <div class="form-group">
               <label>Email</label>

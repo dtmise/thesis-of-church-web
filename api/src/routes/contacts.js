@@ -4,13 +4,13 @@ import { saveContact } from '../db.js';
 const router = Router();
 
 router.post('/', async (req, res) => {
-    const { email, telegram, vk } = req.body;
+    const { telegram, vk } = req.body;
 
-    if (!email && !telegram && !vk) {
+    if (!telegram && !vk) {
         return res.status(400).json({ error: 'Укажите хотя бы один способ связи' });
     }
 
-    const contact = await saveContact({ email, telegram, vk });
+    const contact = await saveContact({ telegram, vk });
     res.status(201).json({ message: 'Контакт сохранён', contact });
 });
 

@@ -14,6 +14,7 @@ export const auth = reactive({
     this.user = user
     localStorage.setItem('token', token)
     localStorage.setItem('user', JSON.stringify(user))
+    localStorage.setItem('hasLoggedIn', '1')
   },
 
   logout() {
