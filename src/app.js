@@ -27,7 +27,7 @@ if (process.env.NODE_ENV !== 'test') {
 const app = express();
 
 app.use(cors({
-    origin: 'http://localhost:3000', // your frontend origin
+    origin: 'https://computable.tech', // your frontend origin
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
