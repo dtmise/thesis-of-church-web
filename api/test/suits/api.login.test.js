@@ -1,6 +1,6 @@
 import getAgent from 'supertest';
 
-const port  = process.env.PORT;
+const port  = process.env.API_PORT;
 const agent = await getAgent(`http://localhost:${port}`);
 const url   = '/api/auth/login';
 

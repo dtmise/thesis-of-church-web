@@ -2,7 +2,7 @@ import getAgent from 'supertest';
 import registerTeam from './util/registerTeam.js';
 import loginUserAndGetToken from './util/logInUserAndGetToken.js';
 
-const port  = process.env.PORT;
+const port  = process.env.API_PORT;
 const agent = await getAgent(`http://localhost:${port}`);
 
 describe('GET /api/teams', () => {

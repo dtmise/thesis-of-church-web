@@ -1,7 +1,7 @@
 import getAgent from 'supertest';
 import registerTeamAndGetToken from './util/registerTeamAndGetToken';
 
-const port  = process.env.PORT;
+const port  = process.env.API_PORT;
 const agent = await getAgent(`http://localhost:${port}`);
 const url   = '/api/profile';
 

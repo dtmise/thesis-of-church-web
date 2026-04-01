@@ -3,7 +3,7 @@ import { findUserById } from '../db.js';
 import { getEnvironmentData } from 'node:worker_threads';
 import { decode } from 'node:punycode';
 
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.API_JWT_SECRET;
 if (!JWT_SECRET) throw new Error('There is no environment variable JWT_SECRET');
 
 export function generateToken(userId) {

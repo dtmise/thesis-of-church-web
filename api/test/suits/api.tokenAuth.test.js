@@ -3,7 +3,7 @@ import registerTeamAndGetToken from './util/registerTeamAndGetToken';
 import registerTeam from './util/registerTeam';
 import logInUserAndGetToken from './util/logInUserAndGetToken';
 
-const port  = process.env.PORT;
+const port  = process.env.API_PORT;
 const agent = await getAgent(`http://localhost:${port}`);
 const url   = '/api/auth/me';
 

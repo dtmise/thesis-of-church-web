@@ -1,0 +1,17 @@
+{
+  "name": "redirect",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "redirect-server.js",
+  "scripts": {
+    "prod": "pm2 start \"node redirect-server.js\"",
+    "dev": "node redirect-server.js"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "pm2": "^6.0.14"
+  }
+}

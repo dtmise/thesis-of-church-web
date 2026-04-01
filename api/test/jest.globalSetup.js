@@ -8,7 +8,7 @@ export default async (globalConfig, projectConfig) => {
         const currentDirPath = dirname(currentFilePath);
         return joinPath(currentDirPath, relativePath);
     }
-    const envFileAbsolutePath = resolveAbsolute('../sns/test.env');
+    const envFileAbsolutePath = resolveAbsolute('./res/test.env');
     process.loadEnvFile(envFileAbsolutePath);
 
     const dbFactoryAbsolutePath = resolveAbsolute('./utils/dbFactory.js');

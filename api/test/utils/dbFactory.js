@@ -5,11 +5,11 @@ const dbFactory = new class {
     constructor() {
         this.db = undefined;
         this.dbConfigs = {
-            host: process.env.DB_HOST,
-            port: process.env.DB_PORT,
-            user: process.env.DB_USER,
-            database: process.env.DB_NAME,
-            password: process.env.DB_PASSWORD
+            host: process.env.API_DB_HOST,
+            port: process.env.API_DB_PORT,
+            user: process.env.API_DB_USER,
+            database: process.env.API_DB_NAME,
+            password: process.env.API_DB_PASSWORD
         };
      }
 
