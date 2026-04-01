@@ -13,10 +13,12 @@ async function request(endpoint, options = {}) {
 
 export const api = {
   login: (creds) => request('/auth/login', { method: 'POST', body: JSON.stringify(creds) }),
-  registerTeam: (data) => request('/auth/register-team', { method: 'POST', body: JSON.stringify(data) }),
+  register: (data) => request('/auth/register', { method: 'POST', body: JSON.stringify(data) }),
   getProfile: () => request('/auth/me'),
   getTeams: () => request('/teams'),
   getNews: () => request('/news'),
+  createTeam: (name) => request('/teams', { method: 'POST', body: JSON.stringify({ name }) }),
+  joinTeam: (inviteCode) => request('/teams/join', { method: 'POST', body: JSON.stringify({ inviteCode }) }),
   updateProfile: (data) => request('/profile', { method: 'PUT', body: JSON.stringify(data) }),
   updateEmail: (email) => request('/profile/email', { method: 'PUT', body: JSON.stringify({ email }) }),
   updatePassword: (oldPassword, newPassword) => request('/profile/password', { method: 'PUT', body: JSON.stringify({ oldPassword, newPassword }) }),

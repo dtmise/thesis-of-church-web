@@ -21,6 +21,7 @@ CREATE TABLE contacts (
 CREATE TABLE teams (
     id              SERIAL       PRIMARY KEY,
     name            VARCHAR(255) NOT NULL    UNIQUE,
+    invite_code     VARCHAR(36)  UNIQUE,
     score           INTEGER      DEFAULT 0
 );
 
@@ -30,6 +31,6 @@ CREATE TABLE users (
     email           VARCHAR(255) NOT NULL    UNIQUE,
     university_group VARCHAR(255) NOT NULL,
     password_hash   TEXT         NOT NULL,
-    role            VARCHAR(50)  NOT NULL,
+    role            VARCHAR(50),
     team_id         INTEGER      REFERENCES teams(id) ON DELETE SET NULL
 );

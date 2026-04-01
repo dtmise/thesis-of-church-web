@@ -1,62 +1,36 @@
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import {
-    createTeam, createUser, findUserByEmail,
-    findTeamByName, findTeamById
+    createUser, findUserByEmail, findTeamById, getTeamMembers
 } from '../db.js';
 import { generateToken, authGuard } from '../middleware/authGuard.js';
 
 const router = Router();
 
-router.post('/register-team', async (req, res) => {
-    console.log('inside register-team');
-    const { teamName, members } = req.body;
+router.post('/register', async (req, res) => {
+    const { fullName, group, email, password } = req.body;
 
-    if (!teamName || !members || !Array.isArray(members)) {
-        return res.status(400).json({ error: 'Неверный формат запроса' });
+    if (!fullName || !group || !email || !password) {
+        return res.status(400).json({ error: 'Заполните все поля' });
     }
 
-    if (members.length < 1 || members.length > 3) {
-        return res.status(400).json({ error: 'Команда: от 1 до 3 участников' });
-    }
-    
-    const foundTeam = await findTeamByName(teamName);
-    if (foundTeam) {
-        return res.status(409).json({ error: 'Название команды уже занято' });
+    if (password.length < 6) {
+        return res.status(400).json({ error: 'Пароль минимум 6 символов' });
     }
 
-    for (const m of members) {
-        const user = await findUserByEmail(m.email);
-        if (user) {
-            return res.status(409).json({ error: `Email ${m.email} уже занят` });
-        }
+    const existing = await findUserByEmail(email);
+    if (existing) {
+        return res.status(409).json({ error: 'Email уже занят' });
     }
 
-    const team = await createTeam(teamName);
-    const users = [];
-
-    for (let i = 0; i < members.length; i++) {
-        const m = members[i];
-        const passwordHash = await bcrypt.hash(m.password, 10);
-        const user = await createUser({
-            fullName: m.fullName,
-            group: m.group,
-            email: m.email,
-            passwordHash,
-            teamId: team.id,
-            role: i === 0 ? 'captain' : 'member'
-        });
-        users.push({ id: user.id, fullName: user.fullName, email: user.email });
-    }
-    const captain = users[0],
-          token   = generateToken(captain.id);
+    const passwordHash = await bcrypt.hash(password, 10);
+    const user = await createUser({ fullName, group, email, passwordHash });
+    const token = generateToken(user.id);
 
     res.status(201).json({
-        team,
-        users,
         token,
-        user: captain,
-        message: 'Команда успешно зарегистрирована'
+        user: { id: user.id, fullName, email, group, teamId: null, role: null },
+        message: 'Регистрация успешна'
     });
 });
 
@@ -87,14 +61,30 @@ router.post('/login', async (req, res) => {
 
 router.get('/me', authGuard, async (req, res) => {
     const user = req.user;
-    const team = await findTeamById(user.teamId);
+    let team = null;
+    if (user.teamId) {
+        const t = await findTeamById(user.teamId);
+        if (t) {
+            const members = (await getTeamMembers(user.teamId)).map(m => ({
+                id: m.id,
+                fullName: m.fullName,
+                group: m.group,
+                email: m.email,
+                role: m.role
+            }));
+            team = { id: t.id, name: t.name, score: t.score, members };
+            if (user.role === 'captain') {
+                team.invite_code = t.invite_code;
+            }
+        }
+    }
     res.json({
         id: user.id,
         fullName: user.fullName,
         group: user.group,
         email: user.email,
         role: user.role,
-        team: team ? { id: team.id, name: team.name } : null
+        team
     });
 });
 

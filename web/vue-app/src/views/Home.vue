@@ -29,49 +29,28 @@
         <!-- Register form -->
         <form v-if="tab === 'register'" class="auth-form active" @submit.prevent="onRegister">
           <div class="form-section">
-            <h2>Информация о команде</h2>
+            <h2>Создать аккаунт</h2>
             <div class="form-group">
-              <label>Название команды</label>
-              <input v-model="teamName" type="text" placeholder="Например: Code Warriors" required>
-              <div class="input-hint">Уникальное название от 3 до 50 символов</div>
+              <label>ФИО</label>
+              <input v-model="regForm.fullName" type="text" placeholder="Иванов Иван Иванович" required>
             </div>
-          </div>
-
-          <div class="form-section">
-            <h2>Участники команды</h2>
-            <div v-for="(m, i) in members" :key="i" class="member-card">
-              <div class="member-header">
-                <span :class="['member-badge', { captain: i === 0 }]">{{ i === 0 ? 'Капитан' : `Участник ${i + 1}` }}</span>
-                <button v-if="i > 0" type="button" class="remove-member-btn" @click="members.splice(i, 1)">✕</button>
-              </div>
-              <div class="member-fields">
-                <div class="form-group">
-                  <label>ФИО</label>
-                  <input v-model="m.fullName" type="text" placeholder="Иванов Иван Иванович" required>
-                </div>
-                <div class="form-group">
-                  <label>Группа</label>
-                  <input v-model="m.group" type="text" placeholder="ИУ5-51Б" required>
-                </div>
-                <div class="form-group">
-                  <label>Email</label>
-                  <input v-model="m.email" type="email" placeholder="example@mail.com" required>
-                </div>
-                <div class="form-group">
-                  <label>Пароль</label>
-                  <input v-model="m.password" type="password" placeholder="минимум 6 символов" required minlength="6">
-                </div>
-              </div>
+            <div class="form-group">
+              <label>Группа</label>
+              <input v-model="regForm.group" type="text" placeholder="ИУ5-51Б" required>
             </div>
-
-            <button v-if="members.length < 3" type="button" class="btn-add-member" @click="addMember">
-              <span>+</span> Добавить участника
-            </button>
-            <div class="limit-hint">{{ members.length >= 3 ? 'Максимум 3 участника' : `Можно добавить ещё ${3 - members.length}` }}</div>
+            <div class="form-group">
+              <label>Email</label>
+              <input v-model="regForm.email" type="email" placeholder="example@mail.com" required>
+            </div>
+            <div class="form-group">
+              <label>Пароль</label>
+              <input v-model="regForm.password" type="password" placeholder="минимум 6 символов" required minlength="6">
+            </div>
+            <div class="input-hint">После регистрации вы сможете создать команду или присоединиться по приглашению</div>
           </div>
 
           <button type="submit" class="btn-submit" :disabled="loading">
-            {{ loading ? 'Регистрация...' : 'Зарегистрировать команду' }}
+            {{ loading ? 'Регистрация...' : 'Зарегистрироваться' }}
           </button>
           <p v-if="registerError" class="error-message visible">{{ registerError }}</p>
         </form>
@@ -101,13 +80,19 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { auth } from '../composables/auth'
 import ContactModal from '../components/ContactModal.vue'
 
 const router = useRouter()
+const route = useRoute()
 
 onMounted(() => {
+  // Save invite code from URL if present
+  const invite = route.query.invite
+  if (invite) {
+    sessionStorage.setItem('pendingInvite', invite)
+  }
   if (auth.isAuthenticated) router.replace('/dashboard')
 })
 
@@ -133,30 +118,20 @@ async function onLogin() {
 }
 
 // Register
-const teamName = ref('')
-const members = ref([{ fullName: '', group: '', email: '', password: '' }])
+const regForm = ref({ fullName: '', group: '', email: '', password: '' })
 const registerError = ref('')
-
-function addMember() {
-  if (members.value.length < 3) {
-    members.value.push({ fullName: '', group: '', email: '', password: '' })
-  }
-}
 
 async function onRegister() {
   registerError.value = ''
-  if (teamName.value.length < 3) { registerError.value = 'Название команды — минимум 3 символа'; return }
-  for (let i = 0; i < members.value.length; i++) {
-    const m = members.value[i]
-    if (!m.fullName || m.fullName.length < 2) { registerError.value = `Участник ${i+1}: укажите ФИО`; return }
-    if (!m.group) { registerError.value = `Участник ${i+1}: укажите группу`; return }
-    if (!m.email) { registerError.value = `Участник ${i+1}: укажите email`; return }
-    if (!m.password || m.password.length < 6) { registerError.value = `Участник ${i+1}: пароль минимум 6 символов`; return }
-  }
+  const f = regForm.value
+  if (!f.fullName || f.fullName.length < 2) { registerError.value = 'Укажите ФИО'; return }
+  if (!f.group) { registerError.value = 'Укажите группу'; return }
+  if (!f.email) { registerError.value = 'Укажите email'; return }
+  if (!f.password || f.password.length < 6) { registerError.value = 'Пароль минимум 6 символов'; return }
 
   loading.value = true
   try {
-    await auth.registerTeam({ teamName: teamName.value, members: members.value })
+    await auth.register(f.fullName, f.group, f.email, f.password)
     router.push('/dashboard')
   } catch (e) {
     registerError.value = e.message

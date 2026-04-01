@@ -29,10 +29,10 @@ export const auth = reactive({
     return data.user
   },
 
-  async registerTeam(teamData) {
-    const data = await api.registerTeam(teamData)
+  async register(fullName, group, email, password) {
+    const data = await api.register({ fullName, group, email, password })
     this.setSession(data.token, data.user)
-    return data
+    return data.user
   },
 
   async refreshProfile() {

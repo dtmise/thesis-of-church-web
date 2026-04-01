@@ -2,11 +2,11 @@ import dbFactory from '../test/utils/dbFactory.js';
 
 const db = await dbFactory.getDb();
 
-export async function createTeam(teamName) {
-    return db.one('INSERT INTO teams(name) VALUES($1) RETURNING *', [teamName]);
+export async function createTeam(teamName, inviteCode = null) {
+    return db.one('INSERT INTO teams(name, invite_code) VALUES($1, $2) RETURNING *', [teamName, inviteCode]);
 }
 
-export async function createUser({ fullName, group, email, passwordHash, teamId, role }) {
+export async function createUser({ fullName, group, email, passwordHash, teamId = null, role = null }) {
     const res = await db.one(`INSERT INTO users(name, university_group, email, password_hash, team_id, role) 
         VALUES($<fullName>,$<group>,$<email>,$<passwordHash>,$<teamId>,$<role>) RETURNING id`,
         { fullName, group, email, passwordHash, teamId, role }
@@ -125,5 +125,17 @@ export async function saveContact({ email, telegram, vk }) {
     return db.one(
         'INSERT INTO contacts(email, telegram, vk) VALUES($1, $2, $3) RETURNING *',
         [email || null, telegram || null, vk || null]
+    );
+}
+
+export async function findTeamByInviteCode(inviteCode) {
+    return db.oneOrNone('SELECT * FROM teams WHERE invite_code = $1', [inviteCode]);
+}
+
+export async function setUserTeam(userId, teamId, role) {
+    return db.oneOrNone(
+        `UPDATE users SET team_id = $1, role = $2 WHERE id = $3
+        RETURNING id, name AS "fullName", university_group AS group, email, team_id AS "teamId", role`,
+        [teamId, role, userId]
     );
 }

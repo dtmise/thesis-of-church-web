@@ -18,27 +18,79 @@
             <p><strong>ФИО:</strong> <span>{{ profile.fullName }}</span></p>
             <p><strong>Группа:</strong> <span>{{ profile.group }}</span></p>
             <p><strong>Email:</strong> <span>{{ profile.email }}</span></p>
-            <p><strong>Роль:</strong> <span>{{ roleText }}</span></p>
+            <p v-if="profile.role"><strong>Роль:</strong> <span>{{ roleText }}</span></p>
           </div>
           <div v-else class="loading-spinner">Загрузка...</div>
           <button class="btn-edit" @click="openEditModal">Редактировать</button>
         </div>
 
-        <!-- Team -->
-        <div class="info-block team-block">
+        <!-- Team (has team) -->
+        <div v-if="profile?.team" class="info-block team-block">
           <div class="block-icon">👥</div>
           <h2>Моя команда</h2>
-          <div v-if="myTeam" class="team-details">
-            <h3>{{ myTeam.name }}</h3>
+          <div class="team-details">
+            <h3>{{ profile.team.name }}</h3>
             <div class="team-stats">
-              <p><strong>Участников:</strong> {{ myTeam.membersCount }}</p>
+              <p><strong>Участников:</strong> {{ profile.team.members?.length || 0 }} / 3</p>
             </div>
-            <span class="team-badge">{{ profile?.role === 'captain' ? 'Вы капитан' : 'Вы участник' }}</span>
+            <span class="team-badge">{{ profile.role === 'captain' ? 'Вы капитан' : 'Вы участник' }}</span>
+
+            <!-- Invite link (captain only, hide when team full) -->
+            <div v-if="profile.role === 'captain' && profile.team.invite_code && (profile.team.members?.length || 0) < 3" class="invite-section">
+              <label><strong>Ссылка-приглашение:</strong></label>
+              <div class="invite-link-row">
+                <input :value="inviteLink" readonly class="invite-input" @click="$event.target.select()">
+                <button type="button" :class="['btn-copy', { 'btn-copy-done': copied }]" @click="copyInvite">{{ copied ? 'Скопировано' : 'Копировать' }}</button>
+              </div>
+              <div class="input-hint">Отправьте эту ссылку участникам для присоединения к команде</div>
+            </div>
+
+            <!-- Team members -->
+            <div v-if="profile.team.members?.length" class="team-members-list">
+              <h4>Участники</h4>
+              <div v-for="m in profile.team.members" :key="m.id" class="team-member-row">
+                <span class="member-name">{{ m.fullName }}</span>
+                <span class="member-role-badge">{{ m.role === 'captain' ? '👑' : '👤' }}</span>
+                <span class="member-group">{{ m.group }}</span>
+              </div>
+            </div>
           </div>
-          <div v-else-if="!loading" class="empty-state">
-            <p>🏠 Вы пока не состоите в команде</p>
+        </div>
+
+        <!-- Team (no team) -->
+        <div v-else-if="profile && !profile.team" class="info-block team-block">
+          <div class="block-icon">👥</div>
+          <h2>Команда</h2>
+          <div class="no-team-section">
+            <p class="empty-state-text">Одному, конечно, тоже можно, но вместе — веселее и эффективнее!</p>
+
+            <!-- Create team -->
+            <div class="team-action-card">
+              <h3>Создать команду</h3>
+              <form @submit.prevent="onCreateTeam">
+                <div class="form-group">
+                  <input v-model="newTeamName" type="text" placeholder="Название команды" required minlength="3">
+                </div>
+                <button type="submit" class="btn-primary" :disabled="teamLoading">
+                  {{ teamLoading ? 'Создание...' : 'Создать' }}
+                </button>
+              </form>
+            </div>
+
+            <!-- Join team -->
+            <div class="team-action-card">
+              <h3>Присоединиться</h3>
+              <form @submit.prevent="onJoinTeam">
+                <div class="form-group">
+                  <input v-model="joinCode" type="text" placeholder="Код приглашения" required>
+                </div>
+                <button type="submit" class="btn-primary" :disabled="teamLoading">
+                  {{ teamLoading ? 'Присоединение...' : 'Присоединиться' }}
+                </button>
+              </form>
+            </div>
+            <p v-if="teamError" class="error-message visible">{{ teamError }}</p>
           </div>
-          <div v-else class="loading-spinner">Загрузка...</div>
         </div>
 
         <!-- News -->
@@ -127,8 +179,14 @@ const { show: notify } = useNotification()
 
 const loading = ref(true)
 const profile = ref(null)
-const myTeam = ref(null)
 const news = ref([])
+
+// Team management
+const teamLoading = ref(false)
+const teamError = ref('')
+const newTeamName = ref('')
+const joinCode = ref('')
+const copied = ref(false)
 
 // Edit modal state
 const editOpen = ref(false)
@@ -138,7 +196,12 @@ const teamNameEdit = ref('')
 
 const roleText = computed(() => {
   if (!profile.value) return ''
-  return profile.value.role === 'captain' ? '👑 Капитан команды' : '👥 Участник команды'
+  return profile.value.role === 'captain' ? '👑 Капитан команды' : '👤 Участник команды'
+})
+
+const inviteLink = computed(() => {
+  if (!profile.value?.team?.invite_code) return ''
+  return `${window.location.origin}/?invite=${profile.value.team.invite_code}`
 })
 
 function formatDate(dateStr) {
@@ -154,24 +217,70 @@ function formatDate(dateStr) {
 async function loadData() {
   loading.value = true
   try {
-    const [p, teams, n] = await Promise.all([
+    const [p, n] = await Promise.all([
       api.getProfile(),
-      api.getTeams(),
       api.getNews()
     ])
     profile.value = p
     auth.user = p
     localStorage.setItem('user', JSON.stringify(p))
     news.value = n || []
-
-    if (p?.team?.id) {
-      myTeam.value = teams.find(t => t.id === p.team.id) || null
-    }
   } catch (e) {
     notify(e.message || 'Ошибка загрузки', 'error')
   } finally {
     loading.value = false
   }
+}
+
+// Auto-join from invite link
+async function checkPendingInvite() {
+  const invite = sessionStorage.getItem('pendingInvite')
+  if (invite && !profile.value?.team) {
+    sessionStorage.removeItem('pendingInvite')
+    try {
+      await api.joinTeam(invite)
+      notify('Вы присоединились к команде!', 'success')
+      await loadData()
+    } catch (e) {
+      notify(e.message || 'Не удалось присоединиться', 'error')
+    }
+  } else if (invite) {
+    sessionStorage.removeItem('pendingInvite')
+  }
+}
+
+async function onCreateTeam() {
+  teamError.value = ''
+  teamLoading.value = true
+  try {
+    await api.createTeam(newTeamName.value)
+    notify('Команда создана!', 'success')
+    await loadData()
+  } catch (e) {
+    teamError.value = e.message
+  } finally {
+    teamLoading.value = false
+  }
+}
+
+async function onJoinTeam() {
+  teamError.value = ''
+  teamLoading.value = true
+  try {
+    await api.joinTeam(joinCode.value)
+    notify('Вы присоединились к команде!', 'success')
+    await loadData()
+  } catch (e) {
+    teamError.value = e.message
+  } finally {
+    teamLoading.value = false
+  }
+}
+
+function copyInvite() {
+  navigator.clipboard.writeText(inviteLink.value)
+  copied.value = true
+  setTimeout(() => { copied.value = false }, 2000)
 }
 
 function openEditModal() {
@@ -182,7 +291,7 @@ function openEditModal() {
       email: profile.value.email
     }
     pwForm.value = { oldPassword: '', newPassword: '' }
-    if (myTeam.value) teamNameEdit.value = myTeam.value.name
+    if (profile.value.team) teamNameEdit.value = profile.value.team.name
   }
   editOpen.value = true
 }
@@ -223,7 +332,10 @@ function onLogout() {
   router.push('/')
 }
 
-onMounted(loadData)
+onMounted(async () => {
+  await loadData()
+  await checkPendingInvite()
+})
 </script>
 
 <style scoped>
@@ -240,5 +352,100 @@ onMounted(loadData)
   margin: 24px 0;
   border: none;
   border-top: 1px solid var(--border);
+}
+.no-team-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.empty-state-text {
+  color: var(--secondary);
+  text-align: center;
+  margin: 0;
+}
+.team-action-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+}
+.team-action-card h3 {
+  margin: 0 0 12px 0;
+  font-size: 1rem;
+}
+.team-action-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.team-action-card .form-group {
+  margin: 0;
+}
+.team-action-card .btn-primary {
+  align-self: flex-start;
+}
+.invite-section {
+  margin-top: 16px;
+}
+.invite-link-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+.invite-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  font-size: 0.85rem;
+  color: var(--text);
+  cursor: pointer;
+}
+.btn-copy {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background: #030912;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  transition: background 0.2s, border-color 0.2s;
+}
+.btn-copy:hover {
+  opacity: 0.85;
+}
+.btn-copy-done {
+  background: #4EA0FF;
+  border-color: #4EA0FF;
+}
+.team-members-list {
+  margin-top: 20px;
+}
+.team-members-list h4 {
+  margin: 0 0 10px 0;
+  font-size: 0.95rem;
+}
+.team-member-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.team-member-row:last-child {
+  border-bottom: none;
+}
+.member-name {
+  font-weight: 500;
+  flex: 1;
+}
+.member-role-badge {
+  font-size: 1rem;
+}
+.member-group {
+  color: var(--secondary);
+  font-size: 0.9rem;
 }
 </style>

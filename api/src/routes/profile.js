@@ -10,15 +10,23 @@ const router = Router();
 
 router.get('/', async (req, res) => {
     const user = req.user;
-    console.log('before findTeamById, user:', user);
-    const team = await findTeamById(user.teamId);
-    console.log('before getTeamMembers, team:', team);
-    const members = (await getTeamMembers(user.teamId)).map(m => ({
-        id: m.id,
-        fullName: m.fullName,
-        group: m.group,
-        email: m.email
-    }));
+    let team = null;
+    if (user.teamId) {
+        const t = await findTeamById(user.teamId);
+        if (t) {
+            const members = (await getTeamMembers(user.teamId)).map(m => ({
+                id: m.id,
+                fullName: m.fullName,
+                group: m.group,
+                email: m.email,
+                role: m.role
+            }));
+            team = { id: t.id, name: t.name, score: t.score, members };
+            if (user.role === 'captain') {
+                team.invite_code = t.invite_code;
+            }
+        }
+    }
 
     res.json({
         id: user.id,
