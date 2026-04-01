@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Church-Turing Thesis - Личный кабинет</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="dashboard-wrapper">
+        <!-- Верхний заголовок -->
+        <header class="dashboard-header">
+            <h1>Church-Turing Thesis</h1>
+            <div class="user-info">
+                <span id="user-name" class="user-name-display"></span>
+                <button id="logout-btn" class="btn-logout">Выйти</button>
+            </div>
+        </header>
+        
+        <!-- Основной контент -->
+        <main class="dashboard-main">
+            <!-- Три блока по центру -->
+            <div class="blocks-container">
+                <!-- Блок профиля -->
+                <div class="info-block profile-block">
+                    <div class="block-icon">👤</div>
+                    <h2>Мой профиль</h2>
+                    <div class="profile-info">
+                        <p><strong>ФИО:</strong> <span id="profile-fullname"></span></p>
+                        <p><strong>Группа:</strong> <span id="profile-group"></span></p>
+                        <p><strong>Email:</strong> <span id="profile-email"></span></p>
+                        <p><strong>Роль:</strong> <span id="profile-role"></span></p>
+                    </div>
+                    <button id="edit-profile-btn" class="btn-edit">Редактировать</button>
+                </div>
+                
+                <!-- Блок команды -->
+                <div class="info-block team-block">
+                    <div class="block-icon">👥</div>
+                    <h2>Моя команда</h2>
+                    <div id="my-team-info" class="team-info">
+                        <div class="loading-spinner">Загрузка...</div>
+                    </div>
+                </div>
+                
+                <!-- Блок новостей -->
+                <div class="info-block news-block">
+                    <div class="block-icon">📰</div>
+                    <h2>Новости</h2>
+                    <div id="news-list" class="news-list">
+                        <div class="loading-spinner">Загрузка...</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Модальное окно для редактирования профиля -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Редактировать профиль</h3>
+            <form id="edit-profile-form">
+                <div class="form-group">
+                    <label for="edit-fullname">ФИО:</label>
+                    <input type="text" id="edit-fullname" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-group">Группа:</label>
+                    <input type="text" id="edit-group" required>
+                </div>
+                <button type="submit" class="btn-primary">Сохранить</button>
+            </form>
+        </div>
+    </div>
+    
+    <div id="notification" class="notification"></div>
+    
+    <script type="module" src="js/dashboard-main.js"></script>
+</body>
+</html>

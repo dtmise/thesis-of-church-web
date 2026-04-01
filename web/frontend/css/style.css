@@ -1,0 +1,895 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+    min-height: 100vh;
+    color: #fff;
+}
+
+/* Обертка для дашборда */
+.dashboard-wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Верхний заголовок */
+.dashboard-header {
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    padding: 20px 40px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    animation: slideDown 0.5s ease;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.dashboard-header h1 {
+    font-size: 28px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.5px;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.user-name-display {
+    font-size: 18px;
+    font-weight: 500;
+    color: #fff;
+    padding: 8px 16px;
+    background: rgba(102, 126, 234, 0.2);
+    border-radius: 20px;
+    border: 1px solid rgba(102, 126, 234, 0.3);
+}
+
+.btn-logout {
+    padding: 8px 20px;
+    background: rgba(245, 101, 101, 0.2);
+    color: #f56565;
+    border: 1px solid rgba(245, 101, 101, 0.3);
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.btn-logout:hover {
+    background: rgba(245, 101, 101, 0.3);
+    transform: translateY(-1px);
+}
+
+/* Основной контент */
+.dashboard-main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+}
+
+/* Контейнер с тремя блоками */
+.blocks-container {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    gap: 30px;
+    max-width: 1400px;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+/* Общие стили для блоков */
+.info-block {
+    flex: 1;
+    min-width: 300px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s;
+    animation: fadeInUp 0.6s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.info-block::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    transform: scaleX(0);
+    transition: transform 0.3s;
+}
+
+.info-block:hover::before {
+    transform: scaleX(1);
+}
+
+.info-block:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(102, 126, 234, 0.3);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.block-icon {
+    font-size: 48px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.info-block h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #fff;
+    font-weight: 600;
+}
+
+/* Блок профиля */
+.profile-info p {
+    margin: 12px 0;
+    color: #ddd;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.profile-info strong {
+    color: #667eea;
+    margin-right: 10px;
+    display: inline-block;
+    min-width: 60px;
+}
+
+.btn-edit {
+    width: 100%;
+    margin-top: 20px;
+    padding: 10px;
+    background: rgba(102, 126, 234, 0.2);
+    color: #667eea;
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.btn-edit:hover {
+    background: rgba(102, 126, 234, 0.3);
+    transform: translateY(-1px);
+}
+
+/* Блок команды */
+.team-info {
+    min-height: 200px;
+}
+
+.team-details {
+    text-align: center;
+}
+
+.team-details h3 {
+    color: #667eea;
+    font-size: 20px;
+    margin-bottom: 15px;
+}
+
+.team-stats p {
+    margin: 10px 0;
+    color: #ddd;
+    font-size: 14px;
+}
+
+.team-stats strong {
+    color: #667eea;
+}
+
+.team-badge {
+    display: inline-block;
+    padding: 5px 12px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 20px;
+    font-size: 12px;
+    margin-top: 10px;
+}
+
+.captain-actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+/* Блок новостей */
+.news-list {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.news-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.news-list::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.news-list::-webkit-scrollbar-thumb {
+    background: rgba(102, 126, 234, 0.5);
+    border-radius: 10px;
+}
+
+.news-card {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+    transition: all 0.3s;
+}
+
+.news-card:hover {
+    background: rgba(0, 0, 0, 0.5);
+    transform: translateX(5px);
+}
+
+.news-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.news-header h3 {
+    color: #667eea;
+    font-size: 16px;
+    margin: 0;
+}
+
+.news-date {
+    font-size: 11px;
+    color: #888;
+}
+
+.news-content {
+    color: #bbb;
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Загрузка и пустые состояния */
+.loading-spinner {
+    text-align: center;
+    padding: 40px;
+    color: #888;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #888;
+}
+
+.empty-state p {
+    margin-bottom: 10px;
+}
+
+.error-state {
+    text-align: center;
+    padding: 40px;
+    color: #f56565;
+}
+
+/* Модальное окно */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background: linear-gradient(135deg, #1a1a1a, #0a0a0a);
+    margin: 10% auto;
+    padding: 30px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-content h3 {
+    color: #fff;
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 28px;
+    cursor: pointer;
+    color: #888;
+    transition: color 0.3s;
+}
+
+.close:hover {
+    color: #fff;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #aaa;
+    font-size: 14px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    color: #fff;
+    font-size: 14px;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #667eea;
+    background: rgba(102, 126, 234, 0.1);
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+/* Уведомления */
+.notification {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    padding: 12px 20px;
+    border-radius: 12px;
+    color: white;
+    font-size: 14px;
+    z-index: 10000;
+    display: none;
+    animation: slideInRight 0.3s ease;
+    max-width: 350px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.notification.info {
+    background: linear-gradient(135deg, #4299e1, #3182ce);
+}
+
+.notification.success {
+    background: linear-gradient(135deg, #48bb78, #38a169);
+}
+
+.notification.error {
+    background: linear-gradient(135deg, #f56565, #e53e3e);
+}
+
+/* Адаптивность */
+@media (max-width: 968px) {
+    .blocks-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .info-block {
+        width: 100%;
+        max-width: 500px;
+    }
+    
+    .dashboard-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+        padding: 20px;
+    }
+    
+    .user-info {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .info-block {
+        padding: 20px;
+    }
+    
+    .block-icon {
+        font-size: 36px;
+    }
+    
+    .info-block h2 {
+        font-size: 20px;
+    }
+}
+/* ========== СТИЛИ ДЛЯ СТРАНИЦЫ РЕГИСТРАЦИИ ========== */
+
+.auth-page {
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 40px 20px;
+}
+
+.auth-wrapper {
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.auth-container {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    animation: fadeInUp 0.5s ease;
+}
+
+.auth-header {
+    text-align: center;
+    padding: 40px 40px 20px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.auth-header h1 {
+    font-size: 36px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+}
+
+.auth-header p {
+    color: #888;
+    font-size: 14px;
+}
+
+/* Табы */
+.tabs {
+    display: flex;
+    gap: 0;
+    padding: 0;
+    background: rgba(0, 0, 0, 0.3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 12px 20px;
+    background: transparent;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    border-radius: 12px;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.tab-btn .tab-icon {
+    font-size: 18px;
+}
+
+.tab-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+}
+
+.tab-btn.active {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+/* Формы */
+.auth-form {
+    padding: 40px;
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.auth-form.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Секции форм */
+.form-section {
+    margin-bottom: 30px;
+}
+
+.form-section h2 {
+    font-size: 20px;
+    color: #fff;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.section-icon {
+    font-size: 24px;
+}
+
+.section-description {
+    color: #888;
+    font-size: 13px;
+    margin-bottom: 20px;
+    padding-left: 34px;
+}
+
+/* Группы полей */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    color: #aaa;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.label-icon {
+    font-size: 16px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 16px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: #fff;
+    font-size: 15px;
+    transition: all 0.3s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #667eea;
+    background: rgba(102, 126, 234, 0.1);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-group input::placeholder {
+    color: #555;
+}
+
+.input-hint {
+    font-size: 11px;
+    color: #666;
+    margin-top: 5px;
+    margin-left: 5px;
+}
+
+/* Карточки участников */
+.member-card {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+}
+
+.member-card:hover {
+    background: rgba(0, 0, 0, 0.4);
+    border-color: rgba(102, 126, 234, 0.3);
+}
+
+.member-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.member-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: rgba(102, 126, 234, 0.2);
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #667eea;
+}
+
+.member-badge.captain {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+.badge-icon {
+    font-size: 14px;
+}
+
+.remove-member-btn {
+    background: rgba(245, 101, 101, 0.2);
+    border: none;
+    color: #f56565;
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.remove-member-btn:hover:not(:disabled) {
+    background: rgba(245, 101, 101, 0.4);
+    transform: scale(1.05);
+}
+
+.member-fields {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+@media (max-width: 600px) {
+    .member-fields {
+        grid-template-columns: 1fr;
+    }
+}
+
+.member-fields .form-group {
+    margin-bottom: 0;
+}
+
+/* Кнопка добавления участника */
+.btn-add-member {
+    width: 100%;
+    padding: 12px;
+    background: rgba(102, 126, 234, 0.1);
+    border: 2px dashed rgba(102, 126, 234, 0.3);
+    border-radius: 12px;
+    color: #667eea;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-add-member:hover:not(:disabled) {
+    background: rgba(102, 126, 234, 0.2);
+    border-color: #667eea;
+    transform: translateY(-2px);
+}
+
+.btn-add-member:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.btn-add-member span {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.limit-hint {
+    text-align: center;
+    font-size: 12px;
+    color: #888;
+    margin-top: 5px;
+}
+
+/* Кнопка отправки */
+.btn-submit {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.btn-submit:active {
+    transform: translateY(0);
+}
+
+/* Ошибки */
+.error-message {
+    color: #f56565;
+    font-size: 14px;
+    margin-top: 15px;
+    text-align: center;
+    padding: 10px;
+    background: rgba(245, 101, 101, 0.1);
+    border-radius: 10px;
+    display: none;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .auth-container {
+        margin: 20px;
+    }
+    
+    .auth-header {
+        padding: 30px 20px;
+    }
+    
+    .auth-header h1 {
+        font-size: 28px;
+    }
+    
+    .tabs {
+        padding: 15px 20px 0;
+    }
+    
+    .tab-btn {
+        padding: 10px 15px;
+        font-size: 14px;
+    }
+    
+    .auth-form {
+        padding: 30px 20px;
+    }
+    
+    .form-section h2 {
+        font-size: 18px;
+    }
+    
+    .member-card {
+        padding: 15px;
+    }
+}
+
+/* Анимация появления */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

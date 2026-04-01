@@ -1,0 +1,26 @@
+{
+  "name": "church-turing-thesis-client",
+  "version": "1.0.0",
+  "description": "Для запуска бэка: cd backend npm install npm start",
+  "homepage": "https://github.com/kek284/thesis-of-church#readme",
+  "bugs": {
+    "url": "https://github.com/kek284/thesis-of-church/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kek284/thesis-of-church.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "modules",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "morgan": "^1.10.1"
+  }
+}
