@@ -1,6 +1,6 @@
 import dbFactory from '../test/utils/dbFactory.js';
 
-const db = await dbFactory.getDb('./createScheme.sql');
+const db = await dbFactory.getDb();
 
 export async function createTeam(teamName) {
     return db.one('INSERT INTO teams(name) VALUES($1) RETURNING *', [teamName]);

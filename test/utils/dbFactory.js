@@ -18,18 +18,22 @@ const dbFactory = new class {
             const { default: getPgp } = await import('pg-promise');
             const pgp = getPgp();
             this.db = pgp(this.dbConfigs);
-            let fullPath;
-            if (!isAbsolute(initQueryFile)) {
-                const currentFileUrl = import.meta.url;
-                const currentFilePath = fileURLToPath(currentFileUrl);
-                const currentDir = dirname(currentFilePath);
-                fullPath = joinPath(currentDir, initQueryFile);
-            } else {
-                fullPath = initQueryFile;
+         
+            if (initQueryFile) {
+                let fullPath;
+                if (!isAbsolute(initQueryFile)) {
+                    const currentFileUrl = import.meta.url;
+                    const currentFilePath = fileURLToPath(currentFileUrl);
+                    const currentDir = dirname(currentFilePath);
+                    fullPath = joinPath(currentDir, initQueryFile);
+                } else {
+                    fullPath = initQueryFile;
+                }
+                const initQuery = new pgp.QueryFile(fullPath);
+                await this.db.none(initQuery);
             }
-            const initQuery = new pgp.QueryFile(fullPath);
-            await this.db.none(initQuery);
         }
+        
         return this.db;
     }
 }();
