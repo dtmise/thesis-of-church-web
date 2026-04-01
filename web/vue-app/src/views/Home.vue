@@ -52,7 +52,6 @@
           <button type="submit" class="btn-submit" :disabled="loading">
             {{ loading ? 'Регистрация...' : 'Зарегистрироваться' }}
           </button>
-          <p v-if="registerError" class="error-message visible">{{ registerError }}</p>
         </form>
 
         <!-- Login form -->
@@ -67,12 +66,23 @@
               <label>Пароль</label>
               <input v-model="loginPassword" type="password" placeholder="••••••" required>
             </div>
+            <button type="button" class="forgot-password-link" @click="forgotPasswordOpen = true">
+              Забыли пароль?
+            </button>
           </div>
           <button type="submit" class="btn-submit" :disabled="loading">
             {{ loading ? 'Вход...' : 'Войти' }}
           </button>
-          <p v-if="loginError" class="error-message visible">{{ loginError }}</p>
         </form>
+      </div>
+
+      <div v-if="forgotPasswordOpen" class="modal" style="display:flex;" @click.self="forgotPasswordOpen = false">
+        <div class="modal-content forgot-password-modal">
+          <span class="close" @click="forgotPasswordOpen = false">&times;</span>
+          <h3>Забыли пароль?</h3>
+          <p class="forgot-password-text">Эххх... Это печально. В таком случае скорее пиши в tg:</p>
+          <a href="https://t.me/Q1zin" target="_blank" rel="noopener" class="forgot-password-contact">@Q1zin</a>
+        </div>
       </div>
     </div>
   </div>
@@ -82,10 +92,12 @@
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { auth } from '../composables/auth'
+import { useNotification } from '../composables/notification'
 import ContactModal from '../components/ContactModal.vue'
 
 const router = useRouter()
 const route = useRoute()
+const { show: notify } = useNotification()
 
 onMounted(() => {
   // Save invite code from URL if present
@@ -98,20 +110,43 @@ onMounted(() => {
 
 const tab = ref('register')
 const loading = ref(false)
+const forgotPasswordOpen = ref(false)
 
 // Login
 const loginEmail = ref('')
 const loginPassword = ref('')
-const loginError = ref('')
+
+function isValidEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+}
+
+function isValidGroup(value) {
+  return /^\d{5}$/.test(value)
+}
 
 async function onLogin() {
-  loginError.value = ''
+  const email = loginEmail.value.trim()
+  const password = loginPassword.value.trim()
+
+  if (!email) {
+    notify('Укажите email', 'error')
+    return
+  }
+  if (!isValidEmail(email)) {
+    notify('Укажите корректный email', 'error')
+    return
+  }
+  if (!password) {
+    notify('Укажите пароль', 'error')
+    return
+  }
+
   loading.value = true
   try {
-    await auth.login(loginEmail.value, loginPassword.value)
+    await auth.login(email, password)
     router.push('/dashboard')
   } catch (e) {
-    loginError.value = e.message
+    notify(e.message || 'Ошибка входа', 'error')
   } finally {
     loading.value = false
   }
@@ -119,22 +154,45 @@ async function onLogin() {
 
 // Register
 const regForm = ref({ fullName: '', group: '', email: '', password: '' })
-const registerError = ref('')
 
 async function onRegister() {
-  registerError.value = ''
   const f = regForm.value
-  if (!f.fullName || f.fullName.length < 2) { registerError.value = 'Укажите ФИО'; return }
-  if (!f.group) { registerError.value = 'Укажите группу'; return }
-  if (!f.email) { registerError.value = 'Укажите email'; return }
-  if (!f.password || f.password.length < 6) { registerError.value = 'Пароль минимум 6 символов'; return }
+  const fullName = f.fullName.trim()
+  const group = f.group.trim()
+  const email = f.email.trim()
+  const password = f.password.trim()
+
+  if (!fullName || fullName.length < 2) {
+    notify('Укажите ФИО', 'error')
+    return
+  }
+  if (!group) {
+    notify('Укажите группу', 'error')
+    return
+  }
+  if (!isValidGroup(group)) {
+    notify('Группа должна состоять из 5 цифр', 'error')
+    return
+  }
+  if (!email) {
+    notify('Укажите email', 'error')
+    return
+  }
+  if (!isValidEmail(email)) {
+    notify('Укажите корректный email', 'error')
+    return
+  }
+  if (!password || password.length < 6) {
+    notify('Пароль минимум 6 символов', 'error')
+    return
+  }
 
   loading.value = true
   try {
-    await auth.register(f.fullName, f.group, f.email, f.password)
+    await auth.register(fullName, group, email, password)
     router.push('/dashboard')
   } catch (e) {
-    registerError.value = e.message
+    notify(e.message || 'Ошибка регистрации', 'error')
   } finally {
     loading.value = false
   }

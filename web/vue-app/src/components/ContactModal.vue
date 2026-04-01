@@ -16,7 +16,6 @@
           <input v-model="form.vk" type="text" placeholder="vk.com/id или @username">
         </div>
         <div class="input-hint" style="margin-bottom: 12px; text-align: center;">Заполните хотя бы одно поле</div>
-        <p v-if="error" class="error-text">{{ error }}</p>
         <button type="submit" class="btn-submit">Продолжить</button>
       </form>
       <div class="contact-modal-footer">
@@ -39,10 +38,11 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { api } from '../composables/api'
+import { useNotification } from '../composables/notification'
 
 const show = ref(false)
-const error = ref('')
 const form = ref({ telegram: '', vk: '' })
+const { show: notify } = useNotification()
 
 onMounted(() => {
   if (!localStorage.getItem('contactSubmitted') && !localStorage.getItem('hasLoggedIn')) {
@@ -55,9 +55,11 @@ function close() {
 }
 
 async function submit() {
-  const { telegram, vk } = form.value
+  const telegram = form.value.telegram.trim()
+  const vk = form.value.vk.trim()
+
   if (!telegram && !vk) {
-    error.value = 'Заполните хотя бы одно поле'
+    notify('Заполните хотя бы одно поле: Telegram или VK', 'error')
     return
   }
   try {
@@ -65,7 +67,7 @@ async function submit() {
     localStorage.setItem('contactSubmitted', '1')
     show.value = false
   } catch (e) {
-    error.value = e.message || 'Ошибка отправки'
+    notify(e.message || 'Ошибка отправки', 'error')
   }
 }
 </script>
@@ -106,5 +108,4 @@ async function submit() {
 .social-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
 .social-btn.social-tg:hover { background: #e8f4fd; border-color: #b3daf5; color: #0088cc; }
 .social-btn.social-vk:hover { background: #e8eef8; border-color: #b3c5e6; color: #4a76a8; }
-.error-text { color: var(--error); font-size: 13px; text-align: center; margin-bottom: 10px; }
 </style>

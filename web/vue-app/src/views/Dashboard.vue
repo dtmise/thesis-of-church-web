@@ -113,7 +113,6 @@
                 </button>
               </form>
             </div>
-            <p v-if="teamError" class="error-message visible">{{ teamError }}</p>
           </div>
         </div>
 
@@ -230,7 +229,6 @@ const news = ref([])
 
 // Team management
 const teamLoading = ref(false)
-const teamError = ref('')
 const newTeamName = ref('')
 const joinCode = ref('')
 const copied = ref(false)
@@ -252,6 +250,14 @@ const inviteLink = computed(() => {
   if (!profile.value?.team?.invite_code) return ''
   return `${window.location.origin}/?invite=${profile.value.team.invite_code}`
 })
+
+function isValidEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+}
+
+function isValidGroup(value) {
+  return /^\d{5}$/.test(value)
+}
 
 function formatDate(dateStr) {
   if (!dateStr) return ''
@@ -299,30 +305,46 @@ async function checkPendingInvite() {
 }
 
 async function onCreateTeam() {
-  teamError.value = ''
+  const teamName = newTeamName.value.trim()
+
+  if (!teamName) {
+    notify('Укажите название команды', 'error')
+    return
+  }
+  if (teamName.length < 3) {
+    notify('Название команды должно быть не короче 3 символов', 'error')
+    return
+  }
+
   teamLoading.value = true
   try {
-    await api.createTeam(newTeamName.value)
+    await api.createTeam(teamName)
     newTeamName.value = ''
     notify('Команда создана!', 'success')
     await loadData()
   } catch (e) {
-    teamError.value = e.message
+    notify(e.message || 'Ошибка создания команды', 'error')
   } finally {
     teamLoading.value = false
   }
 }
 
 async function onJoinTeam() {
-  teamError.value = ''
+  const inviteCode = joinCode.value.trim()
+
+  if (!inviteCode) {
+    notify('Укажите код приглашения', 'error')
+    return
+  }
+
   teamLoading.value = true
   try {
-    await api.joinTeam(joinCode.value)
+    await api.joinTeam(inviteCode)
     joinCode.value = ''
     notify('Вы присоединились к команде!', 'success')
     await loadData()
   } catch (e) {
-    teamError.value = e.message
+    notify(e.message || 'Ошибка присоединения к команде', 'error')
   } finally {
     teamLoading.value = false
   }
@@ -370,9 +392,34 @@ function openEditModal() {
 }
 
 async function saveProfile() {
+  const fullName = editForm.value.fullName.trim()
+  const group = editForm.value.group.trim()
+  const email = editForm.value.email.trim()
+
+  if (!fullName || fullName.length < 2) {
+    notify('Укажите ФИО', 'error')
+    return
+  }
+  if (!group) {
+    notify('Укажите группу', 'error')
+    return
+  }
+  if (!isValidGroup(group)) {
+    notify('Группа должна состоять из 5 цифр', 'error')
+    return
+  }
+  if (!email) {
+    notify('Укажите email', 'error')
+    return
+  }
+  if (!isValidEmail(email)) {
+    notify('Укажите корректный email', 'error')
+    return
+  }
+
   try {
-    await api.updateProfile({ fullName: editForm.value.fullName, group: editForm.value.group })
-    await api.updateEmail(editForm.value.email)
+    await api.updateProfile({ fullName, group })
+    await api.updateEmail(email)
     await loadData()
     editOpen.value = false
     notify('Профиль обновлён!', 'success')
@@ -382,8 +429,24 @@ async function saveProfile() {
 }
 
 async function changePassword() {
+  const oldPassword = pwForm.value.oldPassword.trim()
+  const newPassword = pwForm.value.newPassword.trim()
+
+  if (!oldPassword) {
+    notify('Укажите текущий пароль', 'error')
+    return
+  }
+  if (!newPassword) {
+    notify('Укажите новый пароль', 'error')
+    return
+  }
+  if (newPassword.length < 4) {
+    notify('Новый пароль должен быть не короче 4 символов', 'error')
+    return
+  }
+
   try {
-    await api.updatePassword(pwForm.value.oldPassword, pwForm.value.newPassword)
+    await api.updatePassword(oldPassword, newPassword)
     pwForm.value = { oldPassword: '', newPassword: '' }
     editOpen.value = false
     notify('Пароль обновлён!', 'success')
@@ -393,8 +456,19 @@ async function changePassword() {
 }
 
 async function changeTeamName() {
+  const teamName = teamNameEdit.value.trim()
+
+  if (!teamName) {
+    notify('Укажите название команды', 'error')
+    return
+  }
+  if (teamName.length < 3) {
+    notify('Название команды должно быть не короче 3 символов', 'error')
+    return
+  }
+
   try {
-    await api.updateTeamName(teamNameEdit.value)
+    await api.updateTeamName(teamName)
     await loadData()
     editingTeamName.value = false
     notify('Название обновлено!', 'success')

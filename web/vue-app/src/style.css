@@ -124,7 +124,7 @@ body {
 .close:hover { color: var(--text-primary); background: var(--bg); }
 
 /* Forms */
-.form-group { margin-bottom: 12px; }
+.form-group + .form-group { margin-top: 12px; }
 .form-group label { display: block; margin-bottom: 4px; color: var(--text-secondary); font-size: 13px; font-weight: 500; }
 .form-group input {
   width: 100%; padding: 10px 14px; background: var(--surface); border: 1px solid var(--border);
@@ -164,12 +164,62 @@ body {
   box-shadow: 0 2px 8px rgba(28,28,30,0.08);
 }
 
-.auth-form { padding: 20px 32px 28px; animation: fadeIn 0.25s ease; }
+.auth-form { padding: 20px 32px 24px; animation: fadeIn 0.25s ease; }
 @keyframes fadeIn { from { opacity:0; transform: translateY(6px); } to { opacity:1; transform: translateY(0); } }
 
 .form-section { margin-bottom: 16px; }
+.auth-form .form-section { margin-bottom: 0; }
 .form-section h2 { font-size: 15px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
 .input-hint { font-size: 12px; color: var(--text-tertiary); margin-top: 5px; margin-left: 2px; }
+
+.forgot-password-link {
+  margin-top: 2px;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--text-secondary);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color var(--transition);
+}
+.forgot-password-link:hover {
+  color: var(--text-primary);
+}
+
+.forgot-password-modal {
+  max-width: 380px;
+  padding: 20px 22px 18px;
+  text-align: center;
+}
+
+.forgot-password-text {
+  color: var(--text-secondary);
+  font-size: 15px;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+.forgot-password-contact {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 18px;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: #fff;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  transition: opacity var(--transition), transform var(--transition);
+}
+.forgot-password-contact:hover {
+  opacity: 0.88;
+}
+.forgot-password-contact:active {
+  transform: scale(0.98);
+}
 
 .member-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 14px; transition: border-color var(--transition); }
 .member-card:hover { border-color: rgba(0,0,0,0.12); }
@@ -207,12 +257,12 @@ body {
   color: #fff; font-family: var(--font); font-size: 15px; font-weight: 600; cursor: pointer;
   transition: all var(--transition); margin-top: 16px;
 }
+.auth-form .btn-submit {
+  margin-top: 8px;
+}
 .btn-submit:hover { opacity: 0.85; }
 .btn-submit:active { transform: scale(0.98); }
 .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
-
-.error-message { color: var(--error); font-size: 13px; margin-top: 12px; text-align: center; padding: 10px 14px; background: rgba(255,59,48,0.06); border-radius: 10px; display: none; }
-.error-message.visible { display: block; }
 
 /* Hero */
 .hero-section { text-align: center; padding: 0 24px 24px; }
