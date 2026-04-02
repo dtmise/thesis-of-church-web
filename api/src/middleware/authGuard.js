@@ -7,7 +7,7 @@ const JWT_SECRET = process.env.API_JWT_SECRET;
 if (!JWT_SECRET) throw new Error('There is no environment variable JWT_SECRET');
 
 export function generateToken(userId) {
-    return jwt.sign({ userId }, JWT_SECRET, { expiresIn: '24h' });
+    return jwt.sign({ userId }, JWT_SECRET, { expiresIn: '21d' });
 }
 
 export function decodeUserId(token) {
@@ -17,14 +17,11 @@ export function decodeUserId(token) {
 
 export async function authGuard(req, res, next) {
     console.log('went into authGuard');
-    const authHeader = req.headers.authorization;
-    console.log('authHeader', authHeader);
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    const token = req.cookies?.token;
+    console.log('cookie token present:', !!token);
+    if (!token) {
         return res.status(401).json({ error: 'No authorization token' });
     }
-    console.log('went past is-check');
-
-    const token = authHeader.split(' ')[1];
     try {
         const decoded = jwt.verify(token, JWT_SECRET);
         console.log('decoded', decoded);

@@ -1,5 +1,10 @@
 import { Router } from 'express';
-import { getAllTeams, findTeamById, getTeamMembers } from '../db.js';
+import crypto from 'crypto';
+import {
+    getAllTeams, findTeamById, getTeamMembers,
+    findTeamByName, createTeam, findTeamByInviteCode, setUserTeam,
+    clearTeamMembers, deleteTeam
+} from '../db.js';
 import { clearSensInfo } from './users.js';
 
 const router = Router();
@@ -10,13 +15,95 @@ router.get('/', async (req, res) => {
     for (const t of teams) { 
         const users = await getTeamMembers(t.id);
         const usersWoutSensInfo = users.map(clearSensInfo);
+        const { invite_code, ...teamSafe } = t;
         result.push({ 
-            ...t, 
+            ...teamSafe, 
             membersCount: usersWoutSensInfo.length,
             members: usersWoutSensInfo
         });
     };
     res.json(result);
+});
+
+router.post('/', async (req, res) => {
+    const { name } = req.body;
+    if (!name || name.length < 3) {
+        return res.status(400).json({ error: 'Название команды — минимум 3 символа' });
+    }
+
+    if (req.user.teamId) {
+        return res.status(400).json({ error: 'Вы уже состоите в команде' });
+    }
+
+    const existing = await findTeamByName(name);
+    if (existing) {
+        return res.status(409).json({ error: 'Название команды уже занято' });
+    }
+
+    const inviteCode = crypto.randomUUID();
+    const team = await createTeam(name, inviteCode);
+    await setUserTeam(req.user.id, team.id, 'captain');
+
+    res.status(201).json({
+        team: { id: team.id, name: team.name, score: team.score, invite_code: team.invite_code },
+        message: 'Команда создана'
+    });
+});
+
+router.post('/join', async (req, res) => {
+    const { inviteCode } = req.body;
+    if (!inviteCode) {
+        return res.status(400).json({ error: 'Укажите код приглашения' });
+    }
+
+    if (req.user.teamId) {
+        return res.status(400).json({ error: 'Вы уже состоите в команде' });
+    }
+
+    const team = await findTeamByInviteCode(inviteCode);
+    if (!team) {
+        return res.status(404).json({ error: 'Неверный код приглашения' });
+    }
+
+    const members = await getTeamMembers(team.id);
+    if (members.length >= 3) {
+        return res.status(400).json({ error: 'Команда заполнена (максимум 3 участника)' });
+    }
+
+    await setUserTeam(req.user.id, team.id, 'member');
+
+    res.json({
+        team: { id: team.id, name: team.name, score: team.score },
+        message: 'Вы присоединились к команде'
+    });
+});
+
+router.delete('/', async (req, res) => {
+    if (!req.user.teamId) {
+        return res.status(400).json({ error: 'Вы не состоите в команде' });
+    }
+    if (req.user.role !== 'captain') {
+        return res.status(403).json({ error: 'Только капитан может удалить команду' });
+    }
+
+    const teamId = req.user.teamId;
+    await clearTeamMembers(teamId);
+    await deleteTeam(teamId);
+
+    res.json({ message: 'Команда удалена' });
+});
+
+router.post('/leave', async (req, res) => {
+    if (!req.user.teamId) {
+        return res.status(400).json({ error: 'Вы не состоите в команде' });
+    }
+    if (req.user.role === 'captain') {
+        return res.status(400).json({ error: 'Капитан не может покинуть команду. Удалите команду.' });
+    }
+
+    await setUserTeam(req.user.id, null, null);
+
+    res.json({ message: 'Вы покинули команду' });
 });
 
 router.get('/:id', async (req, res) => {

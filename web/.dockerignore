@@ -1,0 +1,6 @@
+node_modules
+frontend-dist
+vue-app/node_modules
+vue-app/dist
+npm-debug.log
+.git

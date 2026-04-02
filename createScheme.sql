@@ -2,20 +2,19 @@ DROP TABLE IF EXISTS contacts;
 DROP TABLE IF EXISTS news;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS teams;
- 
+
+CREATE TABLE contacts (
+    id              SERIAL       PRIMARY KEY,
+    telegram        VARCHAR(255),
+    vk              VARCHAR(255),
+    created_at      TIMESTAMP    NOT NULL    DEFAULT NOW()
+);
+
 CREATE TABLE news (
     id              SERIAL       PRIMARY KEY,
     title           VARCHAR(255) NOT NULL,
     content         TEXT         NOT NULL,
     published_at    TIMESTAMP    NOT NULL    DEFAULT NOW()
-);
-
-CREATE TABLE contacts (
-    id              SERIAL       PRIMARY KEY,
-    email           VARCHAR(255),
-    telegram        VARCHAR(255),
-    vk              VARCHAR(255),
-    created_at      TIMESTAMP    NOT NULL    DEFAULT NOW()
 );
 
 CREATE TABLE teams (
@@ -32,5 +31,6 @@ CREATE TABLE users (
     university_group VARCHAR(255) NOT NULL,
     password_hash   TEXT         NOT NULL,
     role            VARCHAR(50),
+    is_admin        BOOLEAN      DEFAULT false,
     team_id         INTEGER      REFERENCES teams(id) ON DELETE SET NULL
 );
