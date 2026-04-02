@@ -3,9 +3,13 @@ import fs from 'fs';
 import path from 'path';
 import morgan from 'morgan';
 import https from 'https';
+import http from 'http';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 
 const apiPort = process.env.API_PORT || 1904;
+const apiHost = process.env.API_HOST || 'localhost';
+const apiProtocol = process.env.API_USE_HTTPS === 'true' ? 'https' : 'http';
+const useHttps = process.env.WEB_USE_HTTPS === 'true';
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 const app = express();
@@ -13,7 +17,7 @@ app.use(morgan('combined'));
 
 // Проксируем /api на API-сервер (HTTP)
 app.use('/api', createProxyMiddleware({
-    target: `http://127.0.0.1:${apiPort}`,
+    target: `${apiProtocol}://${apiHost}:${apiPort}`,
     changeOrigin: true,
     secure: false,
     pathRewrite: (path) => `/api${path}`,
@@ -38,12 +42,22 @@ app.use((req, res, next) => {
     }
 });
 
-const keyPath = process.env.KEY_PATH,
-      crtPath = process.env.CRT_PATH;
-const options = { 
-    key: fs.readFileSync(keyPath),
-    cert: fs.readFileSync(crtPath)
-};
-const server = https.createServer(options, app);
+let server;
+
+if (useHttps) {
+    const keyPath = process.env.KEY_PATH,
+          crtPath = process.env.CRT_PATH;
+    const options = {
+        key: fs.readFileSync(keyPath),
+        cert: fs.readFileSync(crtPath)
+    };
+    server = https.createServer(options, app);
+} else {
+    server = http.createServer(app);
+}
+
 const port   = process.env.WEB_PORT;
-server.listen(port, () => console.log(`https://localhost:${port}`));
+server.listen(port, () => {
+    const protocol = useHttps ? 'https' : 'http';
+    console.log(`${protocol}://localhost:${port}`);
+});

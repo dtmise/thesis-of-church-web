@@ -13,6 +13,7 @@ import adminRoutes   from './routes/admin.js';
 import errorSupresser from './middleware/errorSupresser.js';
 
 let errorPasser;
+const corsOrigin = process.env.CORS_ORIGIN ?? 'https://computable.tech';
 
 if (process.env.NODE_ENV !== 'test') {
     errorPasser = fn => {
@@ -30,7 +31,7 @@ if (process.env.NODE_ENV !== 'test') {
 const app = express();
 
 app.use(cors({
-    origin: 'https://computable.tech',
+    origin: corsOrigin,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type'],
     credentials: true

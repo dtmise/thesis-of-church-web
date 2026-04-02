@@ -1,4 +1,4 @@
-import dbFactory from '../test/utils/dbFactory.js';
+import dbFactory from './dbFactory.js';
 
 const db = await dbFactory.getDb();
 

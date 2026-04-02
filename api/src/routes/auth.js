@@ -6,6 +6,18 @@ import {
 import { generateToken, authGuard } from '../middleware/authGuard.js';
 
 const router = Router();
+const cookieSecure = process.env.COOKIE_SECURE === 'true';
+const cookieOptions = {
+    httpOnly: true,
+    secure: cookieSecure,
+    sameSite: 'strict',
+    maxAge: 21 * 24 * 60 * 60 * 1000
+};
+const clearCookieOptions = {
+    httpOnly: true,
+    secure: cookieSecure,
+    sameSite: 'strict'
+};
 
 router.post('/register', async (req, res) => {
     const { fullName, group, email, password } = req.body;
@@ -26,12 +38,7 @@ router.post('/register', async (req, res) => {
     const passwordHash = await bcrypt.hash(password, 10);
     const user = await createUser({ fullName, group, email, passwordHash });
     const token = generateToken(user.id);
-    res.cookie('token', token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'strict',
-        maxAge: 21 * 24 * 60 * 60 * 1000
-    });
+    res.cookie('token', token, cookieOptions);
 
     res.status(201).json({
         user: { id: user.id, fullName, email, group, teamId: null, role: null },
@@ -51,12 +58,7 @@ router.post('/login', async (req, res) => {
     }
 
     const token = generateToken(user.id);
-    res.cookie('token', token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'strict',
-        maxAge: 21 * 24 * 60 * 60 * 1000
-    });
+    res.cookie('token', token, cookieOptions);
     res.json({
         user: {
             id: user.id,
@@ -71,7 +73,7 @@ router.post('/login', async (req, res) => {
 });
 
 router.post('/logout', (req, res) => {
-    res.clearCookie('token', { httpOnly: true, secure: true, sameSite: 'strict' });
+    res.clearCookie('token', clearCookieOptions);
     res.json({ message: 'Выход выполнен' });
 });
 
